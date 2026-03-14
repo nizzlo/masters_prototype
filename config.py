@@ -21,8 +21,8 @@ class Settings(BaseSettings):
     chroma_collection_name: str = Field(default="knowledge_base", env="CHROMA_COLLECTION_NAME")
     
     # Vectorization Settings
-    default_chunk_size: int = Field(default=512, env="DEFAULT_CHUNK_SIZE")
-    default_chunk_overlap: int = Field(default=50, env="DEFAULT_CHUNK_OVERLAP")
+    default_chunk_size: int = Field(default=1024, env="DEFAULT_CHUNK_SIZE")
+    default_chunk_overlap: int = Field(default=100, env="DEFAULT_CHUNK_OVERLAP")
     
     # Retrieval Settings
     default_top_k: int = Field(default=5, env="DEFAULT_TOP_K")
