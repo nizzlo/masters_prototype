@@ -388,8 +388,8 @@ class Settings(BaseSettings):
     chroma_collection_name: str = "knowledge_base"
     
     # Vectorization
-    default_chunk_size: int = 512
-    default_chunk_overlap: int = 100
+    default_chunk_size: int = 1500
+    default_chunk_overlap: int = 300
     
     # Retrieval
     default_top_k: int = 10
