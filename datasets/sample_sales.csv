@@ -1,0 +1,13 @@
+Date,Product,Region,Revenue,Units_Sold
+2024-01-15,Widget A,North,45000,150
+2024-01-15,Widget B,North,32000,80
+2024-01-15,Widget A,South,38000,125
+2024-01-15,Widget B,South,28000,70
+2024-02-15,Widget A,North,52000,175
+2024-02-15,Widget B,North,35000,88
+2024-02-15,Widget A,South,41000,135
+2024-02-15,Widget B,South,31000,78
+2024-03-15,Widget A,North,58000,195
+2024-03-15,Widget B,North,39000,98
+2024-03-15,Widget A,South,45000,150
+2024-03-15,Widget B,South,34000,85
