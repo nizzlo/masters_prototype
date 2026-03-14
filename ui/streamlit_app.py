@@ -160,6 +160,39 @@ elif page == "💬 Ask the AI Agent":
                     k=5,
                 )
                 
+                # Calculate retrieval metrics
+                if result.retrieved_chunks:
+                    scores = [chunk.score for chunk in result.retrieved_chunks]
+                    avg_score = sum(scores) / len(scores)
+                    max_score = max(scores)
+                    min_score = min(scores)
+                    score_range = max_score - min_score
+                    
+                    # Display retrieval metrics
+                    st.subheader("📊 Retrieval Metrics")
+                    col1, col2, col3, col4 = st.columns(4)
+                    with col1:
+                        st.metric("Chunks Retrieved", len(result.retrieved_chunks))
+                    with col2:
+                        st.metric("Avg Similarity", f"{avg_score:.3f}")
+                    with col3:
+                        st.metric("Top Score", f"{max_score:.3f}")
+                    with col4:
+                        # Confidence based on top score and score spread
+                        confidence = max_score * (1 - score_range * 0.5) if score_range < 1 else max_score * 0.5
+                        st.metric("Confidence", f"{confidence:.1%}")
+                    
+                    # Score distribution
+                    with st.expander("📈 Score Distribution"):
+                        import pandas as pd
+                        score_data = pd.DataFrame({
+                            "Chunk": [f"Chunk {i+1}" for i in range(len(scores))],
+                            "Similarity Score": scores,
+                            "Source": [chunk.source for chunk in result.retrieved_chunks]
+                        })
+                        st.bar_chart(score_data.set_index("Chunk")["Similarity Score"])
+                        st.dataframe(score_data, use_container_width=True)
+                
                 # Display retrieved chunks
                 st.subheader("📋 Retrieved Context")
                 for i, chunk in enumerate(result.retrieved_chunks):
