@@ -12,7 +12,7 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from agents.orchestrator_agent import OrchestratorAgent
-from config import settings, AVAILABLE_MODELS
+from config import settings, AVAILABLE_MODELS, SESSION_ID
 import tempfile
 
 # Page config
@@ -145,6 +145,10 @@ if page == "Upload Data":
                     
                     if result["status"] == "success":
                         st.success("File processed successfully", icon=":material/check_circle:")
+                        
+                        # Show document info
+                        doc_id = result.get("steps", {}).get("ingestion", {}).get("document_id", "N/A")
+                        st.info(f"**Document ID:** `{doc_id}`  \n**Source:** `{result.get('source_name', uploaded_file.name)}`")
                         
                         # Show processing steps
                         st.subheader("Processing Steps")
@@ -341,4 +345,4 @@ The proxy metrics above use similarity scores (threshold={threshold}) as a relev
 st.sidebar.divider()
 st.sidebar.caption("Adaptive Knowledge System v1.0")
 st.sidebar.caption("Powered by Ollama + ChromaDB")
-st.sidebar.caption(f"Collection: `{settings.chroma_collection_name}`")
+st.sidebar.caption(f"Session: `{SESSION_ID}`")
