@@ -8,7 +8,7 @@ from core.models.document import RetrievedChunk
 class ContextBuilder:
     """Builds context from retrieved chunks."""
     
-    def __init__(self, max_context_length: int = 8000):
+    def __init__(self, max_context_length: int = 12000):
         """
         Initialize the context builder.
         
@@ -34,7 +34,8 @@ class ContextBuilder:
         current_length = 0
         
         for i, chunk in enumerate(chunks):
-            chunk_text = f"[Source: {chunk.source}]\n{chunk.content}"
+            # Include chunk number and similarity score for reference
+            chunk_text = f"[Chunk {i+1} | Source: {chunk.source} | Relevance: {chunk.score:.2f}]\n{chunk.content}"
             chunk_length = len(chunk_text)
             
             if current_length + chunk_length > self.max_context_length:

@@ -37,7 +37,7 @@ class Settings(BaseSettings):
     default_chunk_overlap: int = Field(default=200, env="DEFAULT_CHUNK_OVERLAP")
     
     # Retrieval Settings
-    default_top_k: int = Field(default=10, env="DEFAULT_TOP_K")
+    default_top_k: int = Field(default=15, env="DEFAULT_TOP_K")
     
     # API Settings
     api_host: str = Field(default="0.0.0.0", env="API_HOST")
