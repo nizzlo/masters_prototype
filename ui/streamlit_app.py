@@ -279,49 +279,104 @@ elif page == "AI Agent":
                         st.bar_chart(score_data.set_index("Chunk")["Similarity Score"])
                         st.dataframe(score_data, use_container_width=True)
                     
-                    # Evaluation metrics explanation
-                    with st.expander("Evaluation Metrics Explained"):
-                        st.markdown("""
-**How Retrieval Quality is Measured**
+                    # IR Metrics Section
+                    st.subheader("IR Evaluation Metrics")
+                    
+                    # Relevance threshold for metrics calculation
+                    relevance_threshold = 0.5
+                    K = len(scores)  # Number of retrieved chunks
+                    
+                    # Calculate relevant chunks (above threshold)
+                    relevant_chunks = [(i, s) for i, s in enumerate(scores) if s >= relevance_threshold]
+                    relevant_in_top_k = len(relevant_chunks)
+                    
+                    # Find rank of first relevant chunk (1-indexed)
+                    first_relevant_rank = None
+                    for i, s in enumerate(scores):
+                        if s >= relevance_threshold:
+                            first_relevant_rank = i + 1
+                            break
+                    
+                    # Calculate metrics
+                    precision_at_k = relevant_in_top_k / K if K > 0 else 0
+                    mrr = 1 / first_relevant_rank if first_relevant_rank else 0
+                    
+                    # For Recall, we estimate total_relevant as chunks above threshold
+                    # In production, this would come from ground truth labels
+                    total_relevant_estimate = relevant_in_top_k  # All relevant found in this query
+                    recall_at_k = relevant_in_top_k / total_relevant_estimate if total_relevant_estimate > 0 else 0
+                    
+                    # Display IR metrics
+                    col1, col2, col3 = st.columns(3)
+                    with col1:
+                        st.metric(
+                            "Recall@K", 
+                            f"{recall_at_k:.1%}",
+                            help=f"relevant_in_top_k / total_relevant = {relevant_in_top_k}/{total_relevant_estimate}"
+                        )
+                        st.caption(f"*{relevant_in_top_k} relevant in top {K}*")
+                    with col2:
+                        st.metric(
+                            "Precision@K", 
+                            f"{precision_at_k:.1%}",
+                            help=f"relevant_in_top_k / K = {relevant_in_top_k}/{K}"
+                        )
+                        st.caption(f"*{relevant_in_top_k} of {K} chunks relevant*")
+                    with col3:
+                        st.metric(
+                            "MRR", 
+                            f"{mrr:.3f}",
+                            help=f"1 / rank_of_first_relevant = 1/{first_relevant_rank}" if first_relevant_rank else "No relevant chunk found"
+                        )
+                        st.caption(f"*First relevant at rank {first_relevant_rank}*" if first_relevant_rank else "*No relevant chunk*")
+                    
+                    # Detailed breakdown
+                    with st.expander("Metrics Explanation & Details"):
+                        st.markdown(f"""
+**Relevance Threshold:** `{relevance_threshold}` (chunks with similarity ≥ {relevance_threshold} are considered relevant)
 
-The system uses standard Information Retrieval metrics:
+| Metric | Formula | Value | Interpretation |
+|--------|---------|-------|----------------|
+| **Recall@K** | relevant_in_top_k / total_relevant | {relevant_in_top_k}/{total_relevant_estimate} = **{recall_at_k:.1%}** | What % of relevant chunks were retrieved |
+| **Precision@K** | relevant_in_top_k / K | {relevant_in_top_k}/{K} = **{precision_at_k:.1%}** | What % of top K chunks are relevant |
+| **MRR** | 1 / rank_of_first_relevant | 1/{first_relevant_rank if first_relevant_rank else '∞'} = **{mrr:.3f}** | How quickly a relevant chunk appears |
 
-| Metric | Formula | Description |
-|--------|---------|-------------|
-| **Recall@K** | `relevant_in_top_k / total_relevant` | What % of relevant chunks were retrieved in top K |
-| **Precision@K** | `relevant_in_top_k / K` | What % of top K chunks are relevant |
-| **MRR** | `1 / rank_of_first_relevant` | How quickly a relevant chunk appears |
-
-**Current Score-Based Proxy Metrics:**
+**Additional Metrics:**
 """)
-                        # Calculate proxy metrics based on similarity threshold
-                        threshold = 0.5  # Consider chunks with score > 0.5 as "relevant"
-                        high_quality = sum(1 for s in scores if s > threshold)
-                        
+                        # Calculate additional metrics
                         col1, col2, col3 = st.columns(3)
                         with col1:
-                            proxy_precision = high_quality / len(scores) if scores else 0
-                            st.metric("Precision (proxy)", f"{proxy_precision:.1%}", 
-                                     help=f"Chunks with score > {threshold}")
-                        with col2:
-                            # Normalized Discounted Cumulative Gain proxy
-                            dcg = sum(s / (i + 2) for i, s in enumerate(scores))  # log2(i+2)
-                            ideal_dcg = sum(sorted(scores, reverse=True)[i] / (i + 2) for i in range(len(scores)))
+                            # nDCG
+                            import math
+                            dcg = sum(s / math.log2(i + 2) for i, s in enumerate(scores))
+                            ideal_dcg = sum(sorted(scores, reverse=True)[i] / math.log2(i + 2) for i in range(len(scores)))
                             ndcg = dcg / ideal_dcg if ideal_dcg > 0 else 0
                             st.metric("nDCG", f"{ndcg:.3f}",
-                                     help="Normalized Discounted Cumulative Gain")
+                                     help="Normalized Discounted Cumulative Gain - rewards relevant docs ranked higher")
+                        with col2:
+                            # F1 Score
+                            f1 = 2 * (precision_at_k * recall_at_k) / (precision_at_k + recall_at_k) if (precision_at_k + recall_at_k) > 0 else 0
+                            st.metric("F1@K", f"{f1:.3f}",
+                                     help="Harmonic mean of Precision and Recall")
                         with col3:
-                            # Score consistency
-                            consistency = 1 - (score_range / max_score) if max_score > 0 else 0
-                            st.metric("Score Consistency", f"{consistency:.1%}",
-                                     help="How similar the scores are (less spread = more consistent)")
+                            # Average Precision
+                            ap = 0
+                            relevant_count = 0
+                            for i, s in enumerate(scores):
+                                if s >= relevance_threshold:
+                                    relevant_count += 1
+                                    ap += relevant_count / (i + 1)
+                            ap = ap / relevant_in_top_k if relevant_in_top_k > 0 else 0
+                            st.metric("AP@K", f"{ap:.3f}",
+                                     help="Average Precision - considers ranking order")
                         
                         st.markdown(f"""
 ---
-**Note:** True evaluation requires **ground truth labels** - human-annotated relevant chunks for each query.  
-The proxy metrics above use similarity scores (threshold={threshold}) as a relevance estimate.
+**Note:** True Recall requires **ground truth labels** - human-annotated relevant chunks for each query.  
+Without ground truth, Recall@K = 100% when all high-scoring chunks are retrieved. The proxy metrics above use 
+similarity scores (threshold ≥ {relevance_threshold}) as a relevance estimate.
 
-**Score threshold:** {threshold} · **High-quality chunks:** {high_quality}/{len(scores)}
+**Relevance threshold:** {relevance_threshold} · **Relevant chunks:** {relevant_in_top_k}/{K}
 """)
                 
                 # Display retrieved chunks
