@@ -171,7 +171,7 @@ class ChromaManager:
     def clear(self) -> None:
         """Clear all data from the collection."""
         self.client.delete_collection(self.collection_name)
-        self.collection = self.client.create_collection(
+        self.collection = self.client.get_or_create_collection(
             name=self.collection_name,
             metadata={"hnsw:space": "cosine"},
         )

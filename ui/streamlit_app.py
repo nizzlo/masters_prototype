@@ -18,16 +18,16 @@ import tempfile
 # Page config
 st.set_page_config(
     page_title="Adaptive Knowledge System",
-    page_icon="🧠",
+    page_icon="◇",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
 # Model selection in sidebar
-st.sidebar.title("🧠 Adaptive Knowledge System")
+st.sidebar.title("◇ Adaptive Knowledge System")
 
 # Model selector
-st.sidebar.subheader("⚙️ Model Settings")
+st.sidebar.subheader("⚙ Model Settings")
 current_model = st.session_state.get("selected_model", settings.reasoning_model)
 model_options = list(AVAILABLE_MODELS.keys())
 model_labels = [f"{AVAILABLE_MODELS[m]['name']} ({AVAILABLE_MODELS[m]['speed']})" for m in model_options]
@@ -43,16 +43,16 @@ selected_model = st.sidebar.selectbox(
 
 # Show model info
 model_info = AVAILABLE_MODELS[selected_model]
-st.sidebar.caption(f"ℹ️ {model_info['description']}")
+st.sidebar.caption(f"{model_info['description']}")
 
 # Note about what model affects
 with st.sidebar.expander("What does this affect?"):
     st.markdown("""
-    **✅ Affects:**
+    **Affects:**
     - Vectorization strategy selection
     - Answer generation
     
-    **❌ Does NOT affect:**
+    **Does NOT affect:**
     - Embeddings (always mxbai-embed-large)
     - Document parsing
     - Vector search/retrieval
@@ -72,12 +72,12 @@ st.sidebar.divider()
 # Navigation
 page = st.sidebar.radio(
     "Navigation",
-    ["📤 Upload Data", "📚 Knowledge Base", "💬 Ask the AI Agent"],
+    ["› Upload Data", "› Knowledge Base", "› AI Agent"],
 )
 
 # Main content
-if page == "📤 Upload Data":
-    st.title("📤 Upload Data")
+if page == "› Upload Data":
+    st.title("Upload Data")
     st.markdown("Upload enterprise data to build your knowledge base.")
     
     # File uploader
@@ -90,7 +90,7 @@ if page == "📤 Upload Data":
     if uploaded_file is not None:
         st.info(f"Selected file: **{uploaded_file.name}**")
         
-        if st.button("🚀 Process File", type="primary"):
+        if st.button("→ Process File", type="primary"):
             with st.spinner("Processing file..."):
                 # Save to temp file
                 suffix = os.path.splitext(uploaded_file.name)[1]
@@ -106,25 +106,25 @@ if page == "📤 Upload Data":
                     os.unlink(tmp_path)
                     
                     if result["status"] == "success":
-                        st.success("✅ File processed successfully!")
+                        st.success("✓ File processed successfully")
                         
                         # Show processing steps
                         st.subheader("Processing Steps")
                         for step_name, step_info in result.get("steps", {}).items():
-                            status_icon = "✅" if step_info.get("status") == "success" else "❌"
+                            status_icon = "✓" if step_info.get("status") == "success" else "✗"
                             with st.expander(f"{status_icon} {step_name.replace('_', ' ').title()}"):
                                 for key, value in step_info.items():
                                     if key != "status":
                                         st.write(f"**{key}:** {value}")
                     else:
-                        st.error(f"❌ Processing failed: {result.get('error', 'Unknown error')}")
+                        st.error(f"Processing failed: {result.get('error', 'Unknown error')}")
                 
                 except Exception as e:
                     os.unlink(tmp_path)
-                    st.error(f"❌ Error: {str(e)}")
+                    st.error(f"Error: {str(e)}")
 
-elif page == "📚 Knowledge Base":
-    st.title("📚 Knowledge Base")
+elif page == "› Knowledge Base":
+    st.title("Knowledge Base")
     st.markdown("View information about your indexed documents.")
     
     # Get stats
@@ -142,22 +142,24 @@ elif page == "📚 Knowledge Base":
         st.subheader("Indexed Sources")
         if stats["sources"]:
             for source in stats["sources"]:
-                st.write(f"📄 {source}")
+                st.write(f"• {source}")
         else:
             st.info("No documents indexed yet. Upload some files to get started!")
         
         # Clear button
         st.divider()
-        if st.button("🗑️ Clear Knowledge Base", type="secondary"):
+        if st.button("✗ Clear Knowledge Base", type="secondary"):
             st.session_state.orchestrator.clear_knowledge_base()
-            st.success("Knowledge base cleared!")
+            # Reinitialize orchestrator to get fresh collection reference
+            st.session_state.orchestrator = OrchestratorAgent()
+            st.success("✓ Knowledge base cleared")
             st.rerun()
             
     except Exception as e:
         st.error(f"Error loading stats: {str(e)}")
 
-elif page == "💬 Ask the AI Agent":
-    st.title("💬 Ask the AI Agent")
+elif page == "› AI Agent":
+    st.title("AI Agent")
     st.markdown("Ask questions about your indexed documents.")
     
     # Get available sources for filtering
@@ -172,13 +174,13 @@ elif page == "💬 Ask the AI Agent":
     with col1:
         retrieval_mode = st.radio(
             "Retrieval Mode",
-            ["🌐 Global", "🎯 Scoped"],
+            ["Global", "Scoped"],
             help="Global searches all documents. Scoped lets you select specific sources.",
         )
     
     # Source filter (for scoped mode)
     selected_sources = None
-    if retrieval_mode == "🎯 Scoped" and available_sources:
+    if retrieval_mode == "Scoped" and available_sources:
         with col2:
             selected_sources = st.multiselect(
                 "Select Sources",
@@ -193,12 +195,12 @@ elif page == "💬 Ask the AI Agent":
         height=100,
     )
     
-    if st.button("🔍 Ask", type="primary", disabled=not query):
+    if st.button("→ Ask", type="primary", disabled=not query):
         with st.spinner("Searching knowledge base and generating answer..."):
             try:
                 result = st.session_state.orchestrator.query(
                     query=query,
-                    sources=selected_sources if retrieval_mode == "🎯 Scoped" else None,
+                    sources=selected_sources if retrieval_mode == "Scoped" else None,
                     k=5,
                 )
                 
@@ -211,7 +213,7 @@ elif page == "💬 Ask the AI Agent":
                     score_range = max_score - min_score
                     
                     # Display retrieval metrics
-                    st.subheader("📊 Retrieval Metrics")
+                    st.subheader("Retrieval Metrics")
                     col1, col2, col3, col4 = st.columns(4)
                     with col1:
                         st.metric("Chunks Retrieved", len(result.retrieved_chunks))
@@ -225,7 +227,7 @@ elif page == "💬 Ask the AI Agent":
                         st.metric("Confidence", f"{confidence:.1%}")
                     
                     # Score distribution
-                    with st.expander("📈 Score Distribution"):
+                    with st.expander("Score Distribution"):
                         import pandas as pd
                         score_data = pd.DataFrame({
                             "Chunk": [f"Chunk {i+1}" for i in range(len(scores))],
@@ -236,13 +238,13 @@ elif page == "💬 Ask the AI Agent":
                         st.dataframe(score_data, use_container_width=True)
                 
                 # Display retrieved chunks
-                st.subheader("📋 Retrieved Context")
+                st.subheader("Retrieved Context")
                 for i, chunk in enumerate(result.retrieved_chunks):
-                    with st.expander(f"Chunk {i+1} - {chunk.source} (Score: {chunk.score:.3f})"):
+                    with st.expander(f"#{i+1} · {chunk.source} · {chunk.score:.3f}"):
                         st.write(chunk.content)
                 
                 # Display answer
-                st.subheader("💡 Answer")
+                st.subheader("◆ Answer")
                 st.markdown(result.answer)
                 
                 # Display sources
