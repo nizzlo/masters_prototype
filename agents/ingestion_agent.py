@@ -120,7 +120,7 @@ class IngestionAgent:
         
         # Override source name if provided
         if source_name:
-            document.source = source_name
+            document.metadata.source = source_name
         
         logger.info(f"Successfully ingested document: {document.id}")
         logger.debug(f"Document metadata: {document.metadata}")
