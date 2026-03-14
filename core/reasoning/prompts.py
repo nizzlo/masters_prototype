@@ -11,16 +11,21 @@ Follow these rules:
 4. Be concise and accurate"""
 
 
-RAG_QUERY_TEMPLATE = """Answer the question using ONLY the provided context.
+RAG_QUERY_TEMPLATE = """You are a helpful assistant. Read the following context carefully and answer the user's question.
 
-Context:
+CONTEXT:
 {context}
 
-Question:
-{query}
+USER QUESTION: {query}
 
-If the answer is not in the context, say "Insufficient information in the knowledge base."
-Cite your sources."""
+INSTRUCTIONS:
+- Answer the question based on the context above
+- Be specific and extract relevant details from the context
+- If the context contains information related to the question, provide that information
+- Only say "Insufficient information" if the context truly has NO relevant information
+- Cite the source document(s) used
+
+ANSWER:"""
 
 
 def build_rag_prompt(query: str, context: str) -> str:

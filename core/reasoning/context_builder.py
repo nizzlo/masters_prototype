@@ -8,7 +8,7 @@ from core.models.document import RetrievedChunk
 class ContextBuilder:
     """Builds context from retrieved chunks."""
     
-    def __init__(self, max_context_length: int = 4000):
+    def __init__(self, max_context_length: int = 8000):
         """
         Initialize the context builder.
         
