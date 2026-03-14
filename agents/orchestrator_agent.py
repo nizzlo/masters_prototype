@@ -4,6 +4,7 @@ Orchestrator Agent.
 Coordinates the entire workflow from file upload to query answering.
 """
 
+import os
 from typing import Optional, Any
 from loguru import logger
 
@@ -41,7 +42,7 @@ class OrchestratorAgent:
         
         logger.info("OrchestratorAgent initialized with all sub-agents")
     
-    def process_file(self, file_path: str) -> dict[str, Any]:
+    def process_file(self, file_path: str, source_name: Optional[str] = None) -> dict[str, Any]:
         """
         Process a file through the complete pipeline.
         
@@ -54,6 +55,7 @@ class OrchestratorAgent:
         
         Args:
             file_path: Path to the file to process.
+            source_name: Original filename to use as source (optional).
             
         Returns:
             Processing result with status and metadata.
@@ -61,6 +63,7 @@ class OrchestratorAgent:
         logger.info(f"Processing file: {file_path}")
         result = {
             "file_path": file_path,
+            "source_name": source_name or os.path.basename(file_path),
             "status": "pending",
             "steps": {},
         }
@@ -68,7 +71,7 @@ class OrchestratorAgent:
         try:
             # Step 1: Ingest
             logger.info("Step 1: Ingesting file")
-            document = self.ingestion_agent.ingest(file_path)
+            document = self.ingestion_agent.ingest(file_path, source_name=source_name)
             result["steps"]["ingestion"] = {
                 "status": "success",
                 "document_id": document.id,

@@ -6,7 +6,11 @@ from pydantic_settings import BaseSettings
 from pydantic import Field
 from typing import Literal
 import os
+import uuid
 
+
+# Generate a unique session ID for this instance
+SESSION_ID = str(uuid.uuid4())[:8]
 
 # Available reasoning models
 AVAILABLE_MODELS = {
@@ -26,11 +30,11 @@ class Settings(BaseSettings):
     
     # ChromaDB Configuration
     chroma_persist_directory: str = Field(default="./vector_store/chroma_db", env="CHROMA_PERSIST_DIR")
-    chroma_collection_name: str = Field(default="knowledge_base", env="CHROMA_COLLECTION_NAME")
+    chroma_collection_name: str = Field(default=f"kb_{SESSION_ID}", env="CHROMA_COLLECTION_NAME")
     
     # Vectorization Settings
-    default_chunk_size: int = Field(default=800, env="DEFAULT_CHUNK_SIZE")
-    default_chunk_overlap: int = Field(default=150, env="DEFAULT_CHUNK_OVERLAP")
+    default_chunk_size: int = Field(default=1000, env="DEFAULT_CHUNK_SIZE")
+    default_chunk_overlap: int = Field(default=200, env="DEFAULT_CHUNK_OVERLAP")
     
     # Retrieval Settings
     default_top_k: int = Field(default=10, env="DEFAULT_TOP_K")

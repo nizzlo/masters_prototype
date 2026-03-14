@@ -135,7 +135,10 @@ if page == "Upload Data":
                 
                 # Process
                 try:
-                    result = st.session_state.orchestrator.process_file(tmp_path)
+                    result = st.session_state.orchestrator.process_file(
+                        tmp_path, 
+                        source_name=uploaded_file.name
+                    )
                     
                     # Clean up
                     os.unlink(tmp_path)
@@ -293,3 +296,4 @@ elif page == "AI Agent":
 st.sidebar.divider()
 st.sidebar.caption("Adaptive Knowledge System v1.0")
 st.sidebar.caption("Powered by Ollama + ChromaDB")
+st.sidebar.caption(f"Collection: `{settings.chroma_collection_name}`")

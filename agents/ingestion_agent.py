@@ -79,7 +79,7 @@ class IngestionAgent:
                 return parser
         return None
     
-    def ingest(self, file_path: str) -> Document:
+    def ingest(self, file_path: str, source_name: Optional[str] = None) -> Document:
         """
         Ingest a file and return a Document object.
         
@@ -87,6 +87,7 @@ class IngestionAgent:
         
         Args:
             file_path: Path to the file to ingest.
+            source_name: Original filename to use as source (optional).
             
         Returns:
             A Document object with extracted content and metadata.
@@ -116,6 +117,10 @@ class IngestionAgent:
         
         # Parse the file
         document = parser.parse(file_path)
+        
+        # Override source name if provided
+        if source_name:
+            document.source = source_name
         
         logger.info(f"Successfully ingested document: {document.id}")
         logger.debug(f"Document metadata: {document.metadata}")
