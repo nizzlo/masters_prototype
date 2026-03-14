@@ -361,6 +361,7 @@ Implemented in `ui/streamlit_app.py`.
    - Source filter multiselect
    - Retrieved chunks display
    - AI-generated answer
+   - **Model selector** in sidebar (switch between llama3:8b, llama3.2:3b, llama3.2:1b)
 
 ---
 
@@ -369,10 +370,17 @@ Implemented in `ui/streamlit_app.py`.
 All settings in `config.py` using Pydantic Settings:
 
 ```python
+# Available reasoning models
+AVAILABLE_MODELS = {
+    "llama3:8b": {"name": "Llama 3 8B", "description": "Best quality, ~5GB RAM"},
+    "llama3.2:3b": {"name": "Llama 3.2 3B", "description": "Balanced, ~2GB RAM"},
+    "llama3.2:1b": {"name": "Llama 3.2 1B", "description": "Fastest, ~1GB RAM"},
+}
+
 class Settings(BaseSettings):
     # Ollama
     ollama_base_url: str = "http://localhost:11434"
-    reasoning_model: str = "llama3:8b"
+    reasoning_model: str = "llama3:8b"  # Can be changed in UI
     embedding_model: str = "nomic-embed-text"
     
     # ChromaDB
@@ -380,14 +388,14 @@ class Settings(BaseSettings):
     chroma_collection_name: str = "knowledge_base"
     
     # Vectorization
-    default_chunk_size: int = 512
-    default_chunk_overlap: int = 50
+    default_chunk_size: int = 2048
+    default_chunk_overlap: int = 200
     
     # Retrieval
     default_top_k: int = 5
 ```
 
-Override via `.env` file or environment variables.
+Override via `.env` file or environment variables. Model can also be switched in the Streamlit UI sidebar.
 
 ---
 
@@ -419,13 +427,21 @@ Cite your sources.
 # Install Ollama
 curl -fsSL https://ollama.com/install.sh | sh
 
-# Pull models
-ollama pull llama3:8b
+# Pull models (choose based on your needs)
+ollama pull llama3:8b        # Best quality (~5GB RAM)
+# OR
+ollama pull llama3.2:3b      # Balanced (~2GB RAM)
+# OR
+ollama pull llama3.2:1b      # Fastest (~1GB RAM)
+
+# Embedding model (required)
 ollama pull nomic-embed-text
 
 # Start Ollama
 ollama serve
 ```
+
+**Note:** You can switch between reasoning models in the Streamlit UI sidebar.
 
 ### Install Dependencies
 ```bash

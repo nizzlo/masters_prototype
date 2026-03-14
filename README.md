@@ -103,17 +103,20 @@ ollama serve
 
 Pull required models.
 
-Reasoning model:
+Reasoning model (choose one based on your needs):
 
 ```bash
+# Best quality (~5GB RAM)
 ollama pull llama3:8b
+
+# Balanced (~2GB RAM)
+ollama pull llama3.2:3b
+
+# Fastest (~1GB RAM)
+ollama pull llama3.2:1b
 ```
 
-Alternative:
-
-```bash
-ollama pull mistral
-```
+You can switch between models in the Streamlit UI sidebar.
 
 Embedding model:
 

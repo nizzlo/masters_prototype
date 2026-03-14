@@ -8,6 +8,14 @@ from typing import Literal
 import os
 
 
+# Available reasoning models
+AVAILABLE_MODELS = {
+    "llama3:8b": {"name": "Llama 3 8B", "description": "Best quality, ~5GB RAM", "speed": "slower"},
+    "llama3.2:3b": {"name": "Llama 3.2 3B", "description": "Balanced, ~2GB RAM", "speed": "medium"},
+    "llama3.2:1b": {"name": "Llama 3.2 1B", "description": "Fastest, ~1GB RAM", "speed": "fast"},
+}
+
+
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
     

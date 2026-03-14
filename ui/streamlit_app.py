@@ -12,6 +12,7 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from agents.orchestrator_agent import OrchestratorAgent
+from config import settings, AVAILABLE_MODELS
 import tempfile
 
 # Page config
@@ -22,12 +23,53 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# Initialize orchestrator in session state
-if "orchestrator" not in st.session_state:
-    st.session_state.orchestrator = OrchestratorAgent()
-
-# Sidebar navigation
+# Model selection in sidebar
 st.sidebar.title("🧠 Adaptive Knowledge System")
+
+# Model selector
+st.sidebar.subheader("⚙️ Model Settings")
+current_model = st.session_state.get("selected_model", settings.reasoning_model)
+model_options = list(AVAILABLE_MODELS.keys())
+model_labels = [f"{AVAILABLE_MODELS[m]['name']} ({AVAILABLE_MODELS[m]['speed']})" for m in model_options]
+
+selected_idx = model_options.index(current_model) if current_model in model_options else 0
+selected_model = st.sidebar.selectbox(
+    "Reasoning Model",
+    model_options,
+    index=selected_idx,
+    format_func=lambda x: f"{AVAILABLE_MODELS[x]['name']} ({AVAILABLE_MODELS[x]['speed']})",
+    help="Choose between speed and quality"
+)
+
+# Show model info
+model_info = AVAILABLE_MODELS[selected_model]
+st.sidebar.caption(f"ℹ️ {model_info['description']}")
+
+# Note about what model affects
+with st.sidebar.expander("What does this affect?"):
+    st.markdown("""
+    **✅ Affects:**
+    - Vectorization strategy selection
+    - Answer generation
+    
+    **❌ Does NOT affect:**
+    - Embeddings (always nomic-embed-text)
+    - Document parsing
+    - Vector search/retrieval
+    """)
+
+# Reinitialize orchestrator if model changed
+if "selected_model" not in st.session_state or st.session_state.selected_model != selected_model:
+    st.session_state.selected_model = selected_model
+    # Update settings
+    settings.reasoning_model = selected_model
+    st.session_state.orchestrator = OrchestratorAgent()
+    if "selected_model" in st.session_state:
+        st.toast(f"Switched to {model_info['name']}")
+
+st.sidebar.divider()
+
+# Navigation
 page = st.sidebar.radio(
     "Navigation",
     ["📤 Upload Data", "📚 Knowledge Base", "💬 Ask the AI Agent"],

@@ -85,11 +85,24 @@ echo -e "${GREEN}✓${NC} Ollama is running"
 # Check for required models
 echo ""
 echo -e "${BLUE}[2/4] Checking models...${NC}"
-if ! ollama list 2>/dev/null | grep -q "llama3:8b"; then
-    echo -e "${YELLOW}Pulling llama3:8b model (this may take a while)...${NC}"
+
+# Check for reasoning models (at least one should be available)
+REASONING_MODEL_FOUND=false
+for model in "llama3:8b" "llama3.2:3b" "llama3.2:1b"; do
+    if ollama list 2>/dev/null | grep -q "$model"; then
+        echo -e "${GREEN}✓${NC} $model available"
+        REASONING_MODEL_FOUND=true
+    else
+        echo -e "${YELLOW}○${NC} $model not installed"
+    fi
+done
+
+if [ "$REASONING_MODEL_FOUND" = false ]; then
+    echo -e "${YELLOW}No reasoning model found. Pulling llama3:8b (recommended)...${NC}"
+    echo -e "${YELLOW}For faster/lighter model, run: ollama pull llama3.2:1b${NC}"
     ollama pull llama3:8b
+    echo -e "${GREEN}✓${NC} llama3:8b model ready"
 fi
-echo -e "${GREEN}✓${NC} llama3:8b model ready"
 
 if ! ollama list 2>/dev/null | grep -q "nomic-embed-text"; then
     echo -e "${YELLOW}Pulling nomic-embed-text model...${NC}"
