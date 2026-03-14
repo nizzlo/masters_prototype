@@ -63,7 +63,7 @@ Answer + Sources
 | -------------------- | ------------------------------- |
 | Programming Language | Python                          |
 | LLM Runtime          | Ollama                          |
-| Embedding Model      | nomic-embed-text                |
+| Embedding Model      | mxbai-embed-large               |
 | Reasoning Model      | llama3:8b                       |
 | Vector Database      | ChromaDB                        |
 | UI                   | Streamlit                       |
@@ -121,7 +121,7 @@ You can switch between models in the Streamlit UI sidebar.
 Embedding model:
 
 ```bash
-ollama pull nomic-embed-text
+ollama pull mxbai-embed-large
 ```
 
 ---
@@ -319,7 +319,7 @@ Vector Storage
 Embeddings generated using:
 
 ```
-nomic-embed-text
+mxbai-embed-large
 ```
 
 Example:

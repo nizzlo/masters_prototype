@@ -53,7 +53,7 @@ with st.sidebar.expander("What does this affect?"):
     - Answer generation
     
     **❌ Does NOT affect:**
-    - Embeddings (always nomic-embed-text)
+    - Embeddings (always mxbai-embed-large)
     - Document parsing
     - Vector search/retrieval
     """)

@@ -237,7 +237,7 @@ def _embed_chunks(self, chunks: list[Chunk]) -> list[Chunk]:
     return chunks
 ```
 
-Uses Ollama's `nomic-embed-text` model via `core/llm/embedding_client.py`.
+Uses Ollama's `mxbai-embed-large` model via `core/llm/embedding_client.py`.
 
 ---
 
@@ -381,18 +381,18 @@ class Settings(BaseSettings):
     # Ollama
     ollama_base_url: str = "http://localhost:11434"
     reasoning_model: str = "llama3:8b"  # Can be changed in UI
-    embedding_model: str = "nomic-embed-text"
+    embedding_model: str = "mxbai-embed-large"
     
     # ChromaDB
     chroma_persist_directory: str = "./vector_store/chroma_db"
     chroma_collection_name: str = "knowledge_base"
     
     # Vectorization
-    default_chunk_size: int = 2048
-    default_chunk_overlap: int = 200
+    default_chunk_size: int = 512
+    default_chunk_overlap: int = 100
     
     # Retrieval
-    default_top_k: int = 5
+    default_top_k: int = 10
 ```
 
 Override via `.env` file or environment variables. Model can also be switched in the Streamlit UI sidebar.
@@ -435,7 +435,7 @@ ollama pull llama3.2:3b      # Balanced (~2GB RAM)
 ollama pull llama3.2:1b      # Fastest (~1GB RAM)
 
 # Embedding model (required)
-ollama pull nomic-embed-text
+ollama pull mxbai-embed-large
 
 # Start Ollama
 ollama serve
@@ -484,7 +484,7 @@ Starts Ollama, FastAPI, and Streamlit with a single command:
 
 [2/4] Checking models...
 ✓ llama3:8b model ready
-✓ nomic-embed-text model ready
+✓ mxbai-embed-large model ready
 
 [3/4] Starting API server...
 ✓ API server running at http://localhost:8000 (PID: 1234)
