@@ -86,9 +86,11 @@ masters_prototype/
 │   └── evaluation_metrics.py   # Recall@K, MRR, etc.
 │
 ├── datasets/                   # Sample test data
-├── logs/                       # Application logs
+├── logs/                       # Application logs & PID files
 ├── config.py                   # Configuration
 ├── main.py                     # CLI entry point
+├── run.sh                      # Start all services
+├── stop.sh                     # Stop all services
 ├── requirements.txt            # Dependencies
 └── .env.example               # Environment template
 ```
@@ -370,7 +372,7 @@ All settings in `config.py` using Pydantic Settings:
 class Settings(BaseSettings):
     # Ollama
     ollama_base_url: str = "http://localhost:11434"
-    reasoning_model: str = "llama3"
+    reasoning_model: str = "llama3.2:1b"
     embedding_model: str = "nomic-embed-text"
     
     # ChromaDB
@@ -418,7 +420,7 @@ Cite your sources.
 curl -fsSL https://ollama.com/install.sh | sh
 
 # Pull models
-ollama pull llama3
+ollama pull llama3.2:1b    # Or llama3 for better quality
 ollama pull nomic-embed-text
 
 # Start Ollama
@@ -428,6 +430,86 @@ ollama serve
 ### Install Dependencies
 ```bash
 pip install -r requirements.txt
+```
+
+### Service Management Scripts
+
+The system includes two shell scripts for easy service management:
+
+#### `run.sh` - Start All Services
+
+Starts Ollama, FastAPI, and Streamlit with a single command:
+
+```bash
+./run.sh
+```
+
+**Features:**
+- Creates `logs/` directory automatically
+- Activates virtual environment if present
+- Checks/installs dependencies from `requirements.txt`
+- Verifies Ollama is running and models are available
+- Kills existing processes if ports are in use
+- Waits for ports to become available (10s timeout)
+- Saves PIDs to `logs/api.pid` and `logs/streamlit.pid`
+- Shows error logs if startup fails
+
+**Output:**
+```
+========================================
+  Adaptive Knowledge System Startup    
+========================================
+
+✓ Activating virtual environment...
+✓ Checking dependencies...
+
+[1/4] Checking Ollama...
+✓ Ollama is running
+
+[2/4] Checking models...
+✓ llama3 model ready
+✓ nomic-embed-text model ready
+
+[3/4] Starting API server...
+✓ API server running at http://localhost:8000 (PID: 1234)
+
+[4/4] Starting Streamlit UI...
+✓ Streamlit UI running at http://localhost:8501 (PID: 1235)
+
+========================================
+  Services Started!                    
+========================================
+
+  Streamlit UI:  http://localhost:8501
+  FastAPI:       http://localhost:8000
+  API Docs:      http://localhost:8000/docs
+
+Run ./stop.sh to stop all services
+```
+
+#### `stop.sh` - Stop All Services
+
+Stops all running services cleanly:
+
+```bash
+./stop.sh
+```
+
+**Features:**
+- Uses PID files for reliable process termination
+- Falls back to `pkill` for any orphaned processes
+- Verifies ports are actually freed
+- Color-coded status output
+
+**Output:**
+```
+Stopping services...
+✓ Stopped Streamlit (PID: 1235)
+✓ Stopped FastAPI (PID: 1234)
+✓ Port 8000 is free
+✓ Port 8501 is free
+
+Done.
 ```
 
 ### Run Options
@@ -478,15 +560,20 @@ For comparing adaptive vs baseline approaches.
 | Package | Purpose |
 |---------|---------|
 | langchain | Text splitting, orchestration |
+| langchain-text-splitters | RecursiveCharacterTextSplitter |
 | chromadb | Vector database |
 | ollama | LLM client |
 | fastapi | REST API |
+| uvicorn | ASGI server |
 | streamlit | Web UI |
 | pandas | Tabular data |
 | pdfplumber | PDF parsing |
 | python-docx | Word parsing |
+| openpyxl | Excel parsing |
 | pydantic | Data validation |
+| pydantic-settings | Configuration management |
 | loguru | Logging |
+| python-multipart | File uploads |
 
 ---
 

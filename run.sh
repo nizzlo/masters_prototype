@@ -3,10 +3,11 @@
 # Adaptive Knowledge System - Startup Script
 # This script starts all required services
 
-set -e
-
 PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$PROJECT_DIR"
+
+# Create logs directory if it doesn't exist
+mkdir -p logs
 
 # Colors for output
 RED='\033[0;31m'
@@ -30,24 +31,20 @@ port_in_use() {
     lsof -i :"$1" >/dev/null 2>&1
 }
 
-# Function to cleanup on exit
-cleanup() {
-    echo ""
-    echo -e "${YELLOW}Shutting down services...${NC}"
-    
-    # Kill background processes
-    if [ ! -z "$STREAMLIT_PID" ]; then
-        kill $STREAMLIT_PID 2>/dev/null || true
-    fi
-    if [ ! -z "$API_PID" ]; then
-        kill $API_PID 2>/dev/null || true
-    fi
-    
-    echo -e "${GREEN}Services stopped.${NC}"
-    exit 0
+# Function to wait for port to be ready
+wait_for_port() {
+    local port=$1
+    local timeout=$2
+    local count=0
+    while [ $count -lt $timeout ]; do
+        if port_in_use $port; then
+            return 0
+        fi
+        sleep 1
+        count=$((count + 1))
+    done
+    return 1
 }
-
-trap cleanup SIGINT SIGTERM
 
 # Check for Python
 if ! command_exists python3; then
@@ -104,46 +101,47 @@ echo -e "${GREEN}✓${NC} nomic-embed-text model ready"
 echo ""
 echo -e "${BLUE}[3/4] Starting API server...${NC}"
 if port_in_use 8000; then
-    echo -e "${YELLOW}Port 8000 already in use, skipping API server${NC}"
-else
-    python3 -m uvicorn api.server:app --host 0.0.0.0 --port 8000 > logs/api.log 2>&1 &
-    API_PID=$!
+    echo -e "${YELLOW}Port 8000 already in use, killing existing process...${NC}"
+    pkill -f "uvicorn api.server" 2>/dev/null || true
     sleep 2
-    if port_in_use 8000; then
-        echo -e "${GREEN}✓${NC} API server running at http://localhost:8000"
-    else
-        echo -e "${RED}✗${NC} Failed to start API server"
-    fi
+fi
+nohup python3 -m uvicorn api.server:app --host 0.0.0.0 --port 8000 > logs/api.log 2>&1 &
+API_PID=$!
+echo $API_PID > logs/api.pid
+if wait_for_port 8000 10; then
+    echo -e "${GREEN}✓${NC} API server running at http://localhost:8000 (PID: $API_PID)"
+else
+    echo -e "${RED}✗${NC} Failed to start API server. Check logs/api.log for details"
+    cat logs/api.log 2>/dev/null | tail -20
 fi
 
 # Start Streamlit UI
 echo ""
 echo -e "${BLUE}[4/4] Starting Streamlit UI...${NC}"
 if port_in_use 8501; then
-    echo -e "${YELLOW}Port 8501 already in use, skipping Streamlit${NC}"
+    echo -e "${YELLOW}Port 8501 already in use, killing existing process...${NC}"
+    pkill -f "streamlit run" 2>/dev/null || true
+    sleep 2
+fi
+nohup python3 -m streamlit run ui/streamlit_app.py --server.headless true > logs/streamlit.log 2>&1 &
+STREAMLIT_PID=$!
+echo $STREAMLIT_PID > logs/streamlit.pid
+if wait_for_port 8501 10; then
+    echo -e "${GREEN}✓${NC} Streamlit UI running at http://localhost:8501 (PID: $STREAMLIT_PID)"
 else
-    python3 -m streamlit run ui/streamlit_app.py --server.headless true > logs/streamlit.log 2>&1 &
-    STREAMLIT_PID=$!
-    sleep 3
-    if port_in_use 8501; then
-        echo -e "${GREEN}✓${NC} Streamlit UI running at http://localhost:8501"
-    else
-        echo -e "${RED}✗${NC} Failed to start Streamlit"
-    fi
+    echo -e "${RED}✗${NC} Failed to start Streamlit. Check logs/streamlit.log for details"
+    cat logs/streamlit.log 2>/dev/null | tail -20
 fi
 
 # Summary
 echo ""
 echo -e "${BLUE}========================================${NC}"
-echo -e "${GREEN}  All services are running!            ${NC}"
+echo -e "${GREEN}  Services Started!                    ${NC}"
 echo -e "${BLUE}========================================${NC}"
 echo ""
 echo -e "  ${GREEN}Streamlit UI:${NC}  http://localhost:8501"
 echo -e "  ${GREEN}FastAPI:${NC}       http://localhost:8000"
 echo -e "  ${GREEN}API Docs:${NC}      http://localhost:8000/docs"
 echo ""
-echo -e "${YELLOW}Press Ctrl+C to stop all services${NC}"
+echo -e "${YELLOW}Run ./stop.sh to stop all services${NC}"
 echo ""
-
-# Wait for user interrupt
-wait
