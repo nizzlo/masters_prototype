@@ -420,7 +420,7 @@ Cite your sources.
 curl -fsSL https://ollama.com/install.sh | sh
 
 # Pull models
-ollama pull llama3.2:1b    # Or llama3 for better quality
+ollama pull llama3.2:1b
 ollama pull nomic-embed-text
 
 # Start Ollama
@@ -467,7 +467,7 @@ Starts Ollama, FastAPI, and Streamlit with a single command:
 ✓ Ollama is running
 
 [2/4] Checking models...
-✓ llama3 model ready
+✓ llama3.2:1b model ready
 ✓ nomic-embed-text model ready
 
 [3/4] Starting API server...

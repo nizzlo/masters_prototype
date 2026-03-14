@@ -64,7 +64,7 @@ Answer + Sources
 | Programming Language | Python                          |
 | LLM Runtime          | Ollama                          |
 | Embedding Model      | nomic-embed-text                |
-| Reasoning Model      | llama3 / mistral                |
+| Reasoning Model      | llama3.2:1b                     |
 | Vector Database      | ChromaDB                        |
 | UI                   | Streamlit                       |
 | Backend API          | FastAPI                         |
@@ -106,7 +106,7 @@ Pull required models.
 Reasoning model:
 
 ```bash
-ollama pull llama3
+ollama pull llama3.2:1b
 ```
 
 Alternative:
