@@ -18,16 +18,51 @@ import tempfile
 # Page config
 st.set_page_config(
     page_title="Adaptive Knowledge System",
-    page_icon="◇",
+    page_icon="⬡",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
+# Inject Material Symbols font
+st.markdown("""
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+<style>
+.material-symbols-outlined {
+    font-family: 'Material Symbols Outlined';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    vertical-align: middle;
+    -webkit-font-smoothing: antialiased;
+    margin-right: 8px;
+}
+.icon-lg {
+    font-size: 28px;
+}
+.icon-sm {
+    font-size: 18px;
+    margin-right: 4px;
+}
+</style>
+""", unsafe_allow_html=True)
+
+def icon(name: str, size: str = "") -> str:
+    """Return HTML for a Material Symbol icon."""
+    css_class = f"material-symbols-outlined {size}".strip()
+    return f'<span class="{css_class}">{name}</span>'
+
 # Model selection in sidebar
-st.sidebar.title("◇ Adaptive Knowledge System")
+st.sidebar.markdown(f'### {icon("hub")} Adaptive Knowledge System', unsafe_allow_html=True)
 
 # Model selector
-st.sidebar.subheader("⚙ Model Settings")
+st.sidebar.markdown(f'{icon("tune")} **Model Settings**', unsafe_allow_html=True)
 current_model = st.session_state.get("selected_model", settings.reasoning_model)
 model_options = list(AVAILABLE_MODELS.keys())
 model_labels = [f"{AVAILABLE_MODELS[m]['name']} ({AVAILABLE_MODELS[m]['speed']})" for m in model_options]
@@ -72,12 +107,12 @@ st.sidebar.divider()
 # Navigation
 page = st.sidebar.radio(
     "Navigation",
-    ["› Upload Data", "› Knowledge Base", "› AI Agent"],
+    ["Upload Data", "Knowledge Base", "AI Agent"],
 )
 
 # Main content
-if page == "› Upload Data":
-    st.title("Upload Data")
+if page == "Upload Data":
+    st.markdown(f'# {icon("upload_file", "icon-lg")} Upload Data', unsafe_allow_html=True)
     st.markdown("Upload enterprise data to build your knowledge base.")
     
     # File uploader
@@ -90,7 +125,7 @@ if page == "› Upload Data":
     if uploaded_file is not None:
         st.info(f"Selected file: **{uploaded_file.name}**")
         
-        if st.button("→ Process File", type="primary"):
+        if st.button("Process File", type="primary", icon=":material/play_arrow:"):
             with st.spinner("Processing file..."):
                 # Save to temp file
                 suffix = os.path.splitext(uploaded_file.name)[1]
@@ -106,7 +141,7 @@ if page == "› Upload Data":
                     os.unlink(tmp_path)
                     
                     if result["status"] == "success":
-                        st.success("✓ File processed successfully")
+                        st.success("File processed successfully", icon=":material/check_circle:")
                         
                         # Show processing steps
                         st.subheader("Processing Steps")
@@ -123,8 +158,8 @@ if page == "› Upload Data":
                     os.unlink(tmp_path)
                     st.error(f"Error: {str(e)}")
 
-elif page == "› Knowledge Base":
-    st.title("Knowledge Base")
+elif page == "Knowledge Base":
+    st.markdown(f'# {icon("database", "icon-lg")} Knowledge Base', unsafe_allow_html=True)
     st.markdown("View information about your indexed documents.")
     
     # Get stats
@@ -142,24 +177,24 @@ elif page == "› Knowledge Base":
         st.subheader("Indexed Sources")
         if stats["sources"]:
             for source in stats["sources"]:
-                st.write(f"• {source}")
+                st.markdown(f'{icon("description", "icon-sm")} {source}', unsafe_allow_html=True)
         else:
             st.info("No documents indexed yet. Upload some files to get started!")
         
         # Clear button
         st.divider()
-        if st.button("✗ Clear Knowledge Base", type="secondary"):
+        if st.button("Clear Knowledge Base", type="secondary", icon=":material/delete:"):
             st.session_state.orchestrator.clear_knowledge_base()
             # Reinitialize orchestrator to get fresh collection reference
             st.session_state.orchestrator = OrchestratorAgent()
-            st.success("✓ Knowledge base cleared")
+            st.success("Knowledge base cleared", icon=":material/check_circle:")
             st.rerun()
             
     except Exception as e:
         st.error(f"Error loading stats: {str(e)}")
 
-elif page == "› AI Agent":
-    st.title("AI Agent")
+elif page == "AI Agent":
+    st.markdown(f'# {icon("smart_toy", "icon-lg")} AI Agent', unsafe_allow_html=True)
     st.markdown("Ask questions about your indexed documents.")
     
     # Get available sources for filtering
@@ -195,13 +230,13 @@ elif page == "› AI Agent":
         height=100,
     )
     
-    if st.button("→ Ask", type="primary", disabled=not query):
+    if st.button("Ask", type="primary", disabled=not query, icon=":material/search:"):
         with st.spinner("Searching knowledge base and generating answer..."):
             try:
                 result = st.session_state.orchestrator.query(
                     query=query,
                     sources=selected_sources if retrieval_mode == "Scoped" else None,
-                    k=5,
+                    k=settings.default_top_k,
                 )
                 
                 # Calculate retrieval metrics
@@ -244,7 +279,7 @@ elif page == "› AI Agent":
                         st.write(chunk.content)
                 
                 # Display answer
-                st.subheader("◆ Answer")
+                st.markdown(f'### {icon("lightbulb", "icon-lg")} Answer', unsafe_allow_html=True)
                 st.markdown(result.answer)
                 
                 # Display sources
