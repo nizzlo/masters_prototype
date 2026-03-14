@@ -1,31 +1,31 @@
 # Automated Vectorization and Knowledge Base Enablement for AI Agents
 
-## Prototype Implementation Plan
+## Prototype Implementation Plan (Full System)
 
 ## 1. Overview
 
 This project implements a **prototype system that automatically converts heterogeneous enterprise data into a vectorized knowledge base that can be queried by an AI agent**.
 
-The system demonstrates the full **knowledge lifecycle automation pipeline** proposed in the research:
+The system demonstrates the full **automated knowledge lifecycle pipeline**:
 
-1. Data ingestion from multiple file formats
+1. Data ingestion from heterogeneous file formats
 2. Automatic structure and metadata analysis
 3. Adaptive vectorization strategy selection using an LLM
-4. Vector embedding generation and storage
-5. Retrieval-augmented AI reasoning over the knowledge base
-6. A user interface for uploading data and querying the system
+4. Embedding generation and vector database storage
+5. Retrieval-Augmented Generation (RAG) for answering queries
+6. A UI for uploading data and interacting with the AI agent
 
 The prototype is designed to support the research objective:
 
 > Design and evaluate an automated system that converts heterogeneous data sources into a unified vector knowledge base that AI agents can reason over.
 
-The system will run **fully locally using Ollama** for the language model.
+The system runs **fully locally using Ollama** for LLM inference.
 
 ---
 
 # 2. System Architecture
 
-The system consists of five main layers:
+The architecture consists of five main layers.
 
 1. Data Ingestion Layer
 2. Data Understanding Layer
@@ -33,9 +33,9 @@ The system consists of five main layers:
 4. Vector Knowledge Base
 5. Retrieval-Augmented AI Agent
 
-The architecture pipeline:
+Pipeline:
 
-```
+```text
 User Upload
      ↓
 Data Ingestion
@@ -67,17 +67,17 @@ Answer + Sources
 | Reasoning Model      | llama3 / mistral                |
 | Vector Database      | ChromaDB                        |
 | UI                   | Streamlit                       |
-| API Backend          | FastAPI                         |
+| Backend API          | FastAPI                         |
 | Orchestration        | LangChain                       |
-| File Parsing         | pandas, pdfplumber, python-docx |
+| Parsing Libraries    | pandas, pdfplumber, python-docx |
 
 ---
 
 # 4. Installing Ollama
 
-The system uses **Ollama to run language models locally**.
+The system uses **Ollama to run local LLM models**.
 
-Install Ollama:
+Install Ollama.
 
 Mac / Linux:
 
@@ -91,7 +91,7 @@ Download installer from:
 
 https://ollama.com
 
-Start Ollama service:
+Start Ollama:
 
 ```bash
 ollama serve
@@ -99,17 +99,17 @@ ollama serve
 
 ---
 
-# 5. Download Required Models
+# 5. Required Models
 
-Pull the models required for the prototype.
+Pull required models.
 
-Main reasoning model:
+Reasoning model:
 
 ```bash
 ollama pull llama3
 ```
 
-Alternative faster model:
+Alternative:
 
 ```bash
 ollama pull mistral
@@ -123,37 +123,36 @@ ollama pull nomic-embed-text
 
 ---
 
-# 6. Project Folder Structure
+# 6. Project Structure
 
-```
+```text
 adaptive-knowledge-system/
 
 agents/
-    orchestrator_agent.py
-    ingestion_agent.py
-    understanding_agent.py
-    vectorization_strategy_agent.py
-    vectorization_agent.py
-    retrieval_agent.py
-    evaluation_agent.py
+  orchestrator_agent.py
+  ingestion_agent.py
+  understanding_agent.py
+  vectorization_strategy_agent.py
+  vectorization_agent.py
+  retrieval_agent.py
+  evaluation_agent.py
 
 core/
-    ingestion/
-    parsing/
-    vectorization/
-    retrieval/
+  ingestion/
+  parsing/
+  vectorization/
+  retrieval/
 
 vector_store/
-    chroma_db/
+  chroma_db/
 
 api/
-    server.py
+  server.py
 
 ui/
-    streamlit_app.py
+  streamlit_app.py
 
 datasets/
-
 experiments/
 
 main.py
@@ -163,15 +162,15 @@ main.py
 
 # 7. Agent-Based System Design
 
-The prototype uses an **agent-based architecture** where each system component is implemented as a specialized agent.
+The system is implemented using **specialized agents coordinated by an Orchestrator Agent**.
 
 ## Orchestrator Agent
 
-The orchestrator coordinates the full pipeline.
+Coordinates the entire workflow.
 
-Pipeline executed by orchestrator:
+Pipeline:
 
-```
+```text
 Upload file
    ↓
 Ingestion Agent
@@ -195,7 +194,7 @@ Answer
 
 # 8. Data Ingestion Agent
 
-The ingestion agent handles parsing and extraction of raw data from uploaded files.
+Handles file parsing and extraction.
 
 Supported formats:
 
@@ -214,18 +213,18 @@ Libraries used:
 Responsibilities:
 
 1. Detect file type
-2. Parse file content
-3. Extract raw text or structured data
-4. Pass data to the understanding layer
+2. Parse file
+3. Extract text or structured data
+4. Create standardized document object
 
-Example output document object:
+Example:
 
-```
+```python
 {
-  content: "...",
-  metadata: {
-      source: "report.pdf",
-      type: "document"
+  "content": "...",
+  "metadata": {
+      "source": "report.pdf",
+      "type": "document"
   }
 }
 ```
@@ -234,30 +233,29 @@ Example output document object:
 
 # 9. Data Understanding Agent
 
-This agent analyzes the structure of the extracted data.
+Analyzes structure and metadata.
 
 Responsibilities:
 
-* detect data type
+* detect document type
 * extract metadata
-* identify schema for tabular data
+* detect schema for tabular data
 * detect document sections
 
-Example output:
+Example:
 
-For tabular data:
+Tabular:
 
-```
+```python
 {
  type: "tabular",
- columns: ["Date", "Revenue", "Region"],
- rows: 500
+ columns: ["Date", "Revenue", "Region"]
 }
 ```
 
-For documents:
+Document:
 
-```
+```python
 {
  type: "document",
  sections: ["Introduction", "Results", "Conclusion"]
@@ -268,15 +266,9 @@ For documents:
 
 # 10. Vectorization Strategy Agent
 
-This agent selects the **best vectorization strategy using an LLM**.
+Uses an LLM to determine the optimal embedding strategy.
 
-Input:
-
-* data type
-* metadata
-* structure
-
-Example prompt to LLM:
+Example prompt:
 
 ```
 You are selecting a vectorization strategy.
@@ -295,74 +287,53 @@ Return only the strategy name.
 
 Possible strategies:
 
-| Data Type           | Strategy               |
-| ------------------- | ---------------------- |
-| Document            | Semantic chunking      |
-| Tabular             | Schema-aware embedding |
-| Structured datasets | Relational embedding   |
+| Data Type          | Strategy               |
+| ------------------ | ---------------------- |
+| Document           | Semantic chunking      |
+| Tabular            | Schema-aware embedding |
+| Structured dataset | Relational embedding   |
 
 ---
 
 # 11. Vectorization Agent
 
-The vectorization agent converts documents into embeddings.
+Converts documents into embeddings.
 
 Pipeline:
 
-```
+```text
 Document
    ↓
 Chunking
    ↓
-Embedding generation
+Embedding Generation
    ↓
-Metadata attachment
+Metadata Attachment
    ↓
-Vector database storage
+Vector Storage
 ```
 
 Embeddings generated using:
 
 ```
-Ollama embedding model: nomic-embed-text
+nomic-embed-text
 ```
 
-Example embedding call:
+Example:
 
 ```python
-requests.post(
- "http://localhost:11434/api/embeddings",
- json={
-   "model": "nomic-embed-text",
-   "prompt": text
- }
-)
+POST http://localhost:11434/api/embeddings
 ```
 
 ---
 
-# 12. Vector Database
+# 12. Vector Knowledge Base
 
-All embeddings are stored in a centralized vector store.
+Embeddings are stored in **ChromaDB**.
 
-Vector database:
+Each vector entry contains:
 
-```
-ChromaDB
-```
-
-Each vector entry stores:
-
-```
-vector
-metadata
-source document
-structure information
-```
-
-Example entry:
-
-```
+```python
 {
  vector: [...],
  metadata: {
@@ -372,22 +343,28 @@ Example entry:
 }
 ```
 
+Metadata enables:
+
+* source filtering
+* document filtering
+* section filtering
+
 ---
 
-# 13. Retrieval Agent
+# 13. Retrieval System
 
-Handles knowledge retrieval when a user asks a question.
+The retrieval agent handles user queries.
 
 Pipeline:
 
-```
+```text
 User Query
    ↓
 Query Embedding
    ↓
 Vector Search
    ↓
-Top-K Relevant Documents
+Top-K Retrieved Chunks
 ```
 
 Optional improvements:
@@ -398,9 +375,75 @@ Optional improvements:
 
 ---
 
-# 14. AI Agent (Reasoning Layer)
+# 14. Retrieval Modes
 
-The AI agent answers questions using retrieved context.
+The UI supports two retrieval modes.
+
+## Global Retrieval
+
+Search entire knowledge base.
+
+```python
+vector_store.similarity_search(query, k=5)
+```
+
+## Scoped Retrieval
+
+Search only selected sources.
+
+Example:
+
+```python
+vector_store.similarity_search(
+ query,
+ k=5,
+ filter={"source": {"$in": selected_sources}}
+)
+```
+
+This allows users to restrict queries to specific documents.
+
+---
+
+# 15. Retrieved Chunk Visualization
+
+Before generating the final answer, the system displays retrieved chunks.
+
+Pipeline:
+
+```text
+User Query
+   ↓
+Vector Search
+   ↓
+Retrieved Chunks
+   ↓
+Display in UI
+   ↓
+AI Agent Reasoning
+   ↓
+Final Answer
+```
+
+Example display:
+
+```
+Retrieved Context
+
+Chunk 1
+Source: report.pdf
+Revenue increased by 18% in Q2.
+
+Chunk 2
+Source: finance.xlsx
+Revenue increased from $4.2M to $4.96M.
+```
+
+---
+
+# 16. AI Agent (Reasoning Layer)
+
+The AI agent generates answers using retrieved context.
 
 Prompt template:
 
@@ -408,32 +451,30 @@ Prompt template:
 Answer the question using ONLY the provided context.
 
 Context:
-{retrieved_documents}
+{retrieved_chunks}
 
 Question:
-{user_query}
+{query}
 
 If the answer is not in the context say "insufficient information".
 ```
 
-The system returns:
+Outputs:
 
 * generated answer
 * source references
 
 ---
 
-# 15. Web UI (Streamlit)
+# 17. Web UI (Streamlit)
 
-A Streamlit interface will be built for demonstration.
+The prototype includes a Streamlit UI.
 
-The UI contains three pages.
+Three main pages.
 
----
+## Upload Data
 
-## Upload Data Page
-
-Allows users to upload enterprise files.
+Users upload enterprise data.
 
 Supported formats:
 
@@ -442,10 +483,10 @@ Supported formats:
 * PDF
 * Word
 
-Processing steps displayed:
+Processing display:
 
 ```
-✓ Format detected
+✓ File detected
 ✓ Structure analyzed
 ✓ Vectorization strategy selected
 ✓ Embeddings generated
@@ -455,7 +496,7 @@ Processing steps displayed:
 
 ## Knowledge Base Viewer
 
-Displays vector database statistics.
+Displays vector database information.
 
 Example:
 
@@ -464,16 +505,24 @@ Documents indexed: 12
 Vector entries: 245
 
 Sources:
-- report.pdf
-- finance.xlsx
-- policy.docx
+report.pdf
+finance.xlsx
+policy.docx
 ```
 
 ---
 
 ## Ask the AI Agent
 
-Allows users to query the knowledge base.
+Users ask questions.
+
+UI features:
+
+* query input
+* retrieval mode selection
+* source filtering
+* retrieved chunk visualization
+* AI response display
 
 Example query:
 
@@ -481,72 +530,58 @@ Example query:
 "What were the key findings in the financial report?"
 ```
 
-Example response:
-
-```
-Answer:
-Revenue increased by 18% in Q2.
-
-Sources:
-report.pdf (section 3)
-finance.xlsx (sheet revenue)
-```
-
 ---
 
-# 16. Backend API
+# 18. Backend API
 
-The backend uses FastAPI.
+FastAPI provides endpoints.
 
-### Upload Endpoint
+Upload endpoint:
 
 ```
 POST /upload
 ```
 
-Triggers ingestion and vectorization pipeline.
-
----
-
-### Query Endpoint
+Query endpoint:
 
 ```
 POST /query
 ```
 
-Triggers retrieval and AI reasoning.
-
----
-
-### Statistics Endpoint
+Statistics endpoint:
 
 ```
 GET /stats
 ```
 
-Returns knowledge base statistics.
-
 ---
 
-# 17. Evaluation Module
+# 19. Evaluation Module
 
-The system will compare two pipelines:
+The prototype compares two pipelines.
+
+Baseline:
 
 ```
-Baseline: Static vectorization
-Proposed: Adaptive vectorization
+Static vectorization
+```
+
+Proposed:
+
+```
+Adaptive vectorization
 ```
 
 Evaluation metrics:
 
 * Recall@k
 * Mean Reciprocal Rank (MRR)
-* Grounding accuracy
-* Response relevance
+* grounding accuracy
+* response relevance
 
 ---
 
-# 18. Development Timeline
+# 20. Development Timeline
 
 Week 1
 Project setup and architecture.
@@ -558,25 +593,25 @@ Week 3
 Implement data understanding layer.
 
 Week 4
-Implement adaptive vectorization strategy.
+Implement vectorization strategy agent.
 
 Week 5
 Implement vector database integration.
 
 Week 6
-Implement retrieval pipeline.
+Implement retrieval system.
 
 Week 7
-Implement AI agent reasoning.
+Implement AI reasoning agent.
 
 Week 8
 Implement Streamlit UI and evaluation experiments.
 
 ---
 
-# 19. Final Prototype Pipeline
+# 21. Final Prototype Pipeline
 
-```
+```text
 Heterogeneous Data
       ↓
 Automated Ingestion
@@ -592,4 +627,4 @@ Retrieval-Augmented AI Agent
 Grounded Response
 ```
 
-The prototype demonstrates an **end-to-end automated knowledge system capable of transforming heterogeneous data into a knowledge base that AI agents can reason over.**
+This prototype demonstrates a **fully automated knowledge system capable of transforming heterogeneous data into a knowledge base that AI agents can reason over**.
