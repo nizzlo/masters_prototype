@@ -85,11 +85,11 @@ echo -e "${GREEN}✓${NC} Ollama is running"
 # Check for required models
 echo ""
 echo -e "${BLUE}[2/4] Checking models...${NC}"
-if ! ollama list 2>/dev/null | grep -q "llama3.2:1b"; then
-    echo -e "${YELLOW}Pulling llama3.2:1b model (this may take a while)...${NC}"
-    ollama pull llama3.2:1b
+if ! ollama list 2>/dev/null | grep -q "llama3:8b"; then
+    echo -e "${YELLOW}Pulling llama3:8b model (this may take a while)...${NC}"
+    ollama pull llama3:8b
 fi
-echo -e "${GREEN}✓${NC} llama3.2:1b model ready"
+echo -e "${GREEN}✓${NC} llama3:8b model ready"
 
 if ! ollama list 2>/dev/null | grep -q "nomic-embed-text"; then
     echo -e "${YELLOW}Pulling nomic-embed-text model...${NC}"

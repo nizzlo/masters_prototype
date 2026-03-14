@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     
     # Ollama Configuration
     ollama_base_url: str = Field(default="http://localhost:11434", env="OLLAMA_BASE_URL")
-    reasoning_model: str = Field(default="llama3.2:1b", env="REASONING_MODEL")
+    reasoning_model: str = Field(default="llama3:8b", env="REASONING_MODEL")
     embedding_model: str = Field(default="nomic-embed-text", env="EMBEDDING_MODEL")
     
     # ChromaDB Configuration

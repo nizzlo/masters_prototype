@@ -372,7 +372,7 @@ All settings in `config.py` using Pydantic Settings:
 class Settings(BaseSettings):
     # Ollama
     ollama_base_url: str = "http://localhost:11434"
-    reasoning_model: str = "llama3.2:1b"
+    reasoning_model: str = "llama3:8b"
     embedding_model: str = "nomic-embed-text"
     
     # ChromaDB
@@ -420,7 +420,7 @@ Cite your sources.
 curl -fsSL https://ollama.com/install.sh | sh
 
 # Pull models
-ollama pull llama3.2:1b
+ollama pull llama3:8b
 ollama pull nomic-embed-text
 
 # Start Ollama
@@ -467,7 +467,7 @@ Starts Ollama, FastAPI, and Streamlit with a single command:
 ✓ Ollama is running
 
 [2/4] Checking models...
-✓ llama3.2:1b model ready
+✓ llama3:8b model ready
 ✓ nomic-embed-text model ready
 
 [3/4] Starting API server...
