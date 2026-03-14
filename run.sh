@@ -104,11 +104,11 @@ if [ "$REASONING_MODEL_FOUND" = false ]; then
     echo -e "${GREEN}✓${NC} llama3:8b model ready"
 fi
 
-if ! ollama list 2>/dev/null | grep -q "nomic-embed-text"; then
-    echo -e "${YELLOW}Pulling nomic-embed-text model...${NC}"
-    ollama pull nomic-embed-text
+if ! ollama list 2>/dev/null | grep -q "mxbai-embed-large"; then
+    echo -e "${YELLOW}Pulling mxbai-embed-large model...${NC}"
+    ollama pull mxbai-embed-large
 fi
-echo -e "${GREEN}✓${NC} nomic-embed-text model ready"
+echo -e "${GREEN}✓${NC} mxbai-embed-large model ready"
 
 # Start FastAPI server
 echo ""

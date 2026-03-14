@@ -22,18 +22,18 @@ class Settings(BaseSettings):
     # Ollama Configuration
     ollama_base_url: str = Field(default="http://localhost:11434", env="OLLAMA_BASE_URL")
     reasoning_model: str = Field(default="llama3:8b", env="REASONING_MODEL")
-    embedding_model: str = Field(default="nomic-embed-text", env="EMBEDDING_MODEL")
+    embedding_model: str = Field(default="mxbai-embed-large", env="EMBEDDING_MODEL")
     
     # ChromaDB Configuration
     chroma_persist_directory: str = Field(default="./vector_store/chroma_db", env="CHROMA_PERSIST_DIR")
     chroma_collection_name: str = Field(default="knowledge_base", env="CHROMA_COLLECTION_NAME")
     
     # Vectorization Settings
-    default_chunk_size: int = Field(default=2048, env="DEFAULT_CHUNK_SIZE")
-    default_chunk_overlap: int = Field(default=200, env="DEFAULT_CHUNK_OVERLAP")
+    default_chunk_size: int = Field(default=512, env="DEFAULT_CHUNK_SIZE")
+    default_chunk_overlap: int = Field(default=100, env="DEFAULT_CHUNK_OVERLAP")
     
     # Retrieval Settings
-    default_top_k: int = Field(default=5, env="DEFAULT_TOP_K")
+    default_top_k: int = Field(default=10, env="DEFAULT_TOP_K")
     
     # API Settings
     api_host: str = Field(default="0.0.0.0", env="API_HOST")
