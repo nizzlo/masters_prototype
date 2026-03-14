@@ -274,6 +274,51 @@ elif page == "AI Agent":
                         })
                         st.bar_chart(score_data.set_index("Chunk")["Similarity Score"])
                         st.dataframe(score_data, use_container_width=True)
+                    
+                    # Evaluation metrics explanation
+                    with st.expander("Evaluation Metrics Explained"):
+                        st.markdown("""
+**How Retrieval Quality is Measured**
+
+The system uses standard Information Retrieval metrics:
+
+| Metric | Formula | Description |
+|--------|---------|-------------|
+| **Recall@K** | `relevant_in_top_k / total_relevant` | What % of relevant chunks were retrieved in top K |
+| **Precision@K** | `relevant_in_top_k / K` | What % of top K chunks are relevant |
+| **MRR** | `1 / rank_of_first_relevant` | How quickly a relevant chunk appears |
+
+**Current Score-Based Proxy Metrics:**
+""")
+                        # Calculate proxy metrics based on similarity threshold
+                        threshold = 0.5  # Consider chunks with score > 0.5 as "relevant"
+                        high_quality = sum(1 for s in scores if s > threshold)
+                        
+                        col1, col2, col3 = st.columns(3)
+                        with col1:
+                            proxy_precision = high_quality / len(scores) if scores else 0
+                            st.metric("Precision (proxy)", f"{proxy_precision:.1%}", 
+                                     help=f"Chunks with score > {threshold}")
+                        with col2:
+                            # Normalized Discounted Cumulative Gain proxy
+                            dcg = sum(s / (i + 2) for i, s in enumerate(scores))  # log2(i+2)
+                            ideal_dcg = sum(sorted(scores, reverse=True)[i] / (i + 2) for i in range(len(scores)))
+                            ndcg = dcg / ideal_dcg if ideal_dcg > 0 else 0
+                            st.metric("nDCG", f"{ndcg:.3f}",
+                                     help="Normalized Discounted Cumulative Gain")
+                        with col3:
+                            # Score consistency
+                            consistency = 1 - (score_range / max_score) if max_score > 0 else 0
+                            st.metric("Score Consistency", f"{consistency:.1%}",
+                                     help="How similar the scores are (less spread = more consistent)")
+                        
+                        st.markdown(f"""
+---
+**Note:** True evaluation requires **ground truth labels** - human-annotated relevant chunks for each query.  
+The proxy metrics above use similarity scores (threshold={threshold}) as a relevance estimate.
+
+**Score threshold:** {threshold} · **High-quality chunks:** {high_quality}/{len(scores)}
+""")
                 
                 # Display retrieved chunks
                 st.subheader("Retrieved Context")
