@@ -1,633 +1,286 @@
-# Automated Vectorization and Knowledge Base Enablement for AI Agents
+# Adaptive Knowledge System
 
-## Prototype Implementation Plan (Full System)
+> Research Prototype: Automated Vectorization and Knowledge Base Enablement for AI Agents
 
-## 1. Overview
+## Overview
 
-This project implements a **prototype system that automatically converts heterogeneous enterprise data into a vectorized knowledge base that can be queried by an AI agent**.
+This system automatically converts **heterogeneous enterprise data** into a **vectorized knowledge base** that AI agents can query using **Retrieval-Augmented Generation (RAG)**. It runs fully locally using **Ollama** for LLM inference.
 
-The system demonstrates the full **automated knowledge lifecycle pipeline**:
-
-1. Data ingestion from heterogeneous file formats
-2. Automatic structure and metadata analysis
-3. Adaptive vectorization strategy selection using an LLM
-4. Embedding generation and vector database storage
-5. Retrieval-Augmented Generation (RAG) for answering queries
-6. A UI for uploading data and interacting with the AI agent
-
-The prototype is designed to support the research objective:
+### Research Objective
 
 > Design and evaluate an automated system that converts heterogeneous data sources into a unified vector knowledge base that AI agents can reason over.
 
-The system runs **fully locally using Ollama** for LLM inference.
+### Key Features
+
+- **Multi-format ingestion** — CSV, Excel, PDF, Word, Text/Markdown
+- **Adaptive vectorization** — LLM-selected chunking strategies based on document structure
+- **Local LLM inference** — Ollama with multiple model options (llama3:8b, llama3.2:3b, llama3.2:1b)
+- **RAG-based Q&A** — Context-grounded answers with source citations
+- **Retrieval metrics** — Real-time Recall@K, Precision@K, MRR, nDCG, F1
+- **Scoped queries** — Filter by specific source documents
+- **Modern UI** — Streamlit interface with Material icons
 
 ---
 
-# 2. System Architecture
+## Quick Start
 
-The architecture consists of five main layers.
+### 1. Prerequisites
 
-1. Data Ingestion Layer
-2. Data Understanding Layer
-3. Adaptive Vectorization Layer
-4. Vector Knowledge Base
-5. Retrieval-Augmented AI Agent
-
-Pipeline:
-
-```text
-User Upload
-     ↓
-Data Ingestion
-     ↓
-Structure Understanding
-     ↓
-Vectorization Strategy Selection (LLM)
-     ↓
-Embedding Generation
-     ↓
-Vector Database Storage
-     ↓
-Retrieval System
-     ↓
-AI Agent Reasoning
-     ↓
-Answer + Sources
-```
-
----
-
-# 3. Technology Stack
-
-| Component            | Technology                      |
-| -------------------- | ------------------------------- |
-| Programming Language | Python                          |
-| LLM Runtime          | Ollama                          |
-| Embedding Model      | mxbai-embed-large               |
-| Reasoning Model      | llama3:8b                       |
-| Vector Database      | ChromaDB                        |
-| UI                   | Streamlit                       |
-| Backend API          | FastAPI                         |
-| Orchestration        | LangChain                       |
-| Parsing Libraries    | pandas, pdfplumber, python-docx |
-
----
-
-# 4. Installing Ollama
-
-The system uses **Ollama to run local LLM models**.
-
-Install Ollama.
-
-Mac / Linux:
-
+**Install Ollama:**
 ```bash
+# macOS / Linux
 curl -fsSL https://ollama.com/install.sh | sh
+
+# Windows: Download from https://ollama.com
 ```
 
-Windows:
-
-Download installer from:
-
-https://ollama.com
-
-Start Ollama:
-
+**Pull required models:**
 ```bash
-ollama serve
-```
+# Reasoning model (choose based on RAM)
+ollama pull llama3:8b        # Best quality (~5GB)
+ollama pull llama3.2:3b      # Balanced (~2GB)
+ollama pull llama3.2:1b      # Fastest (~1GB)
 
----
-
-# 5. Required Models
-
-Pull required models.
-
-Reasoning model (choose one based on your needs):
-
-```bash
-# Best quality (~5GB RAM)
-ollama pull llama3:8b
-
-# Balanced (~2GB RAM)
-ollama pull llama3.2:3b
-
-# Fastest (~1GB RAM)
-ollama pull llama3.2:1b
-```
-
-You can switch between models in the Streamlit UI sidebar.
-
-Embedding model:
-
-```bash
+# Embedding model (required)
 ollama pull mxbai-embed-large
 ```
 
+### 2. Install Dependencies
+
+```bash
+# Create virtual environment (recommended)
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+
+# Install packages
+pip install -r requirements.txt
+```
+
+### 3. Start Services
+
+**Recommended: Use the startup script**
+```bash
+./run.sh
+```
+
+This starts Ollama, FastAPI (port 8000), and Streamlit (port 8501) automatically.
+
+**Or start manually:**
+```bash
+# Terminal 1: Start Ollama
+ollama serve
+
+# Terminal 2: Start Streamlit UI
+streamlit run ui/streamlit_app.py
+```
+
+### 4. Access the UI
+
+Open **http://localhost:8501** in your browser.
+
+### 5. Stop Services
+
+```bash
+./stop.sh
+```
+
 ---
 
-# 6. Project Structure
+## System Architecture
 
 ```text
-adaptive-knowledge-system/
+┌─────────────────────────────────────────────────────────────────┐
+│                      Orchestrator Agent                         │
+│       Coordinates the pipeline from ingestion to response       │
+└─────────────────────────────────────────────────────────────────┘
+        │                    │                    │
+        ▼                    ▼                    ▼
+┌───────────────┐   ┌───────────────┐   ┌───────────────┐
+│   Ingestion   │   │ Understanding │   │   Retrieval   │
+│     Agent     │ → │     Agent     │   │     Agent     │
+└───────────────┘   └───────────────┘   └───────────────┘
+                            │
+                            ▼
+                    ┌───────────────┐   ┌───────────────┐
+                    │   Strategy    │ → │ Vectorization │
+                    │     Agent     │   │     Agent     │
+                    └───────────────┘   └───────────────┘
+```
 
-agents/
-  orchestrator_agent.py
-  ingestion_agent.py
-  understanding_agent.py
-  vectorization_strategy_agent.py
-  vectorization_agent.py
-  retrieval_agent.py
-  evaluation_agent.py
+### Pipeline Flow
 
-core/
-  ingestion/
-  parsing/
-  vectorization/
-  retrieval/
-
-vector_store/
-  chroma_db/
-
-api/
-  server.py
-
-ui/
-  streamlit_app.py
-
-datasets/
-experiments/
-
-main.py
+```
+User Upload → Ingestion → Structure Analysis → Strategy Selection → Chunking → Embedding → Storage → Query → RAG Answer
 ```
 
 ---
 
-# 7. Agent-Based System Design
+## Technology Stack
 
-The system is implemented using **specialized agents coordinated by an Orchestrator Agent**.
+| Component | Technology |
+|-----------|------------|
+| Language | Python 3.10+ |
+| LLM Runtime | Ollama |
+| Embedding Model | mxbai-embed-large |
+| Reasoning Models | llama3:8b, llama3.2:3b, llama3.2:1b |
+| Vector Database | ChromaDB |
+| UI Framework | Streamlit |
+| API Framework | FastAPI |
+| Orchestration | LangChain |
+| Data Parsing | pandas, pdfplumber, python-docx, openpyxl |
+| Validation | Pydantic |
 
-## Orchestrator Agent
+---
 
-Coordinates the entire workflow.
+## Usage
 
-Pipeline:
+### Streamlit UI (Recommended)
 
-```text
-Upload file
-   ↓
-Ingestion Agent
-   ↓
-Understanding Agent
-   ↓
-Vectorization Strategy Agent
-   ↓
-Vectorization Agent
-   ↓
-Vector Store
-   ↓
-Retrieval Agent
-   ↓
-AI Agent
-   ↓
-Answer
+**Upload Data** — Upload files (CSV, Excel, PDF, Word, Text) to build the knowledge base.
+
+**Knowledge Base** — View indexed documents, vector counts, and clear data.
+
+**AI Agent** — Query the knowledge base with natural language:
+- **Global mode**: Search all documents
+- **Scoped mode**: Filter by specific sources
+
+### CLI
+
+```bash
+# Process a file
+python main.py process /path/to/document.pdf
+
+# Query the knowledge base
+python main.py query "What were the key findings?"
+
+# Start API server only
+python main.py api
+
+# Start UI only
+python main.py ui
+```
+
+### REST API
+
+```bash
+# Upload a file
+curl -X POST http://localhost:8000/upload -F "file=@document.pdf"
+
+# Query the knowledge base
+curl -X POST http://localhost:8000/query \
+  -H "Content-Type: application/json" \
+  -d '{"query": "What is the revenue?", "k": 5}'
+
+# Get statistics
+curl http://localhost:8000/stats
+```
+
+API documentation: **http://localhost:8000/docs**
+
+---
+
+## Configuration
+
+Settings are managed via `config.py` and can be overridden with environment variables or a `.env` file:
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `OLLAMA_BASE_URL` | `http://localhost:11434` | Ollama server URL |
+| `REASONING_MODEL` | `llama3:8b` | Model for reasoning (switchable in UI) |
+| `EMBEDDING_MODEL` | `mxbai-embed-large` | Model for embeddings |
+| `DEFAULT_CHUNK_SIZE` | `1000` | Characters per chunk |
+| `DEFAULT_CHUNK_OVERLAP` | `200` | Overlap between chunks |
+| `DEFAULT_TOP_K` | `15` | Number of chunks to retrieve |
+
+---
+
+## Project Structure
+
+```
+masters_prototype/
+├── agents/                     # Agent implementations
+│   ├── orchestrator_agent.py   # Main pipeline coordinator
+│   ├── ingestion_agent.py      # File parsing
+│   ├── understanding_agent.py  # Document structure analysis
+│   ├── vectorization_strategy_agent.py  # LLM strategy selection
+│   ├── vectorization_agent.py  # Chunking & embedding
+│   ├── retrieval_agent.py      # Vector search
+│   └── evaluation_agent.py     # Metrics & experiments
+│
+├── core/                       # Core modules
+│   ├── models/document.py      # Pydantic data models
+│   ├── ingestion/parsers/      # Format-specific parsers
+│   ├── understanding/          # Classifiers & extractors
+│   ├── vectorization/chunkers/ # Chunking strategies
+│   ├── llm/                    # Ollama clients
+│   ├── retrieval/              # Search engine
+│   └── reasoning/              # RAG prompts
+│
+├── vector_store/               # ChromaDB persistence
+├── api/server.py               # FastAPI endpoints
+├── ui/streamlit_app.py         # Streamlit interface
+├── experiments/                # Evaluation scripts
+├── datasets/                   # Sample data
+├── logs/                       # Application logs
+├── config.py                   # Configuration
+├── main.py                     # CLI entry point
+├── run.sh                      # Start all services
+├── stop.sh                     # Stop all services
+└── requirements.txt            # Dependencies
 ```
 
 ---
 
-# 8. Data Ingestion Agent
+## Evaluation Metrics
 
-Handles file parsing and extraction.
+The UI displays real-time retrieval metrics for each query:
 
-Supported formats:
-
-* CSV
-* Excel
-* PDF
-* Word
-* Text
-
-Libraries used:
-
-* pandas
-* pdfplumber
-* python-docx
-
-Responsibilities:
-
-1. Detect file type
-2. Parse file
-3. Extract text or structured data
-4. Create standardized document object
-
-Example:
-
-```python
-{
-  "content": "...",
-  "metadata": {
-      "source": "report.pdf",
-      "type": "document"
-  }
-}
-```
+| Metric | Description |
+|--------|-------------|
+| **Recall@K** | % of relevant chunks retrieved |
+| **Precision@K** | % of retrieved chunks that are relevant |
+| **MRR** | Mean Reciprocal Rank — how fast relevant results appear |
+| **nDCG** | Normalized Discounted Cumulative Gain |
+| **F1@K** | Harmonic mean of Precision and Recall |
+| **AP@K** | Average Precision considering rank order |
 
 ---
 
-# 9. Data Understanding Agent
+## Supported File Types
 
-Analyzes structure and metadata.
-
-Responsibilities:
-
-* detect document type
-* extract metadata
-* detect schema for tabular data
-* detect document sections
-
-Example:
-
-Tabular:
-
-```python
-{
- type: "tabular",
- columns: ["Date", "Revenue", "Region"]
-}
-```
-
-Document:
-
-```python
-{
- type: "document",
- sections: ["Introduction", "Results", "Conclusion"]
-}
-```
+| Format | Extension | Parser |
+|--------|-----------|--------|
+| CSV | `.csv` | pandas |
+| Excel | `.xlsx`, `.xls` | pandas + openpyxl |
+| PDF | `.pdf` | pdfplumber |
+| Word | `.docx`, `.doc` | python-docx |
+| Text | `.txt`, `.md` | built-in |
 
 ---
 
-# 10. Vectorization Strategy Agent
+## Vectorization Strategies
 
-Uses an LLM to determine the optimal embedding strategy.
+The system automatically selects the optimal chunking strategy based on document structure:
 
-Example prompt:
-
-```
-You are selecting a vectorization strategy.
-
-Document type: tabular
-Columns: Date, Revenue, Region
-
-Choose the best strategy:
-
-1. semantic chunking
-2. schema aware embedding
-3. relational embedding
-
-Return only the strategy name.
-```
-
-Possible strategies:
-
-| Data Type          | Strategy               |
-| ------------------ | ---------------------- |
-| Document           | Semantic chunking      |
-| Tabular            | Schema-aware embedding |
-| Structured dataset | Relational embedding   |
+| Strategy | Use Case |
+|----------|----------|
+| **Semantic Chunking** | Text documents (PDF, Word, Text) |
+| **Schema-Aware Embedding** | Tabular data (CSV, Excel) |
+| **Relational Embedding** | Structured/JSON data |
 
 ---
 
-# 11. Vectorization Agent
+## Development
 
-Converts documents into embeddings.
+See [IMPLEMENTATION.md](IMPLEMENTATION.md) for technical implementation details.
 
-Pipeline:
-
-```text
-Document
-   ↓
-Chunking
-   ↓
-Embedding Generation
-   ↓
-Metadata Attachment
-   ↓
-Vector Storage
-```
-
-Embeddings generated using:
-
-```
-mxbai-embed-large
-```
-
-Example:
-
-```python
-POST http://localhost:11434/api/embeddings
-```
+**Extension points:**
+1. Add new parser: Extend `BaseParser` in `core/ingestion/parsers/`
+2. Add chunking strategy: Add to `core/vectorization/chunkers/`
+3. Add retrieval method: Extend `SearchEngine` in `core/retrieval/`
 
 ---
 
-# 12. Vector Knowledge Base
+## License
 
-Embeddings are stored in **ChromaDB**.
-
-Each vector entry contains:
-
-```python
-{
- vector: [...],
- metadata: {
-   source: "report.pdf",
-   section: "summary"
- }
-}
-```
-
-Metadata enables:
-
-* source filtering
-* document filtering
-* section filtering
-
----
-
-# 13. Retrieval System
-
-The retrieval agent handles user queries.
-
-Pipeline:
-
-```text
-User Query
-   ↓
-Query Embedding
-   ↓
-Vector Search
-   ↓
-Top-K Retrieved Chunks
-```
-
-Optional improvements:
-
-* metadata filtering
-* hybrid search
-* reranking
-
----
-
-# 14. Retrieval Modes
-
-The UI supports two retrieval modes.
-
-## Global Retrieval
-
-Search entire knowledge base.
-
-```python
-vector_store.similarity_search(query, k=5)
-```
-
-## Scoped Retrieval
-
-Search only selected sources.
-
-Example:
-
-```python
-vector_store.similarity_search(
- query,
- k=5,
- filter={"source": {"$in": selected_sources}}
-)
-```
-
-This allows users to restrict queries to specific documents.
-
----
-
-# 15. Retrieved Chunk Visualization
-
-Before generating the final answer, the system displays retrieved chunks.
-
-Pipeline:
-
-```text
-User Query
-   ↓
-Vector Search
-   ↓
-Retrieved Chunks
-   ↓
-Display in UI
-   ↓
-AI Agent Reasoning
-   ↓
-Final Answer
-```
-
-Example display:
-
-```
-Retrieved Context
-
-Chunk 1
-Source: report.pdf
-Revenue increased by 18% in Q2.
-
-Chunk 2
-Source: finance.xlsx
-Revenue increased from $4.2M to $4.96M.
-```
-
----
-
-# 16. AI Agent (Reasoning Layer)
-
-The AI agent generates answers using retrieved context.
-
-Prompt template:
-
-```
-Answer the question using ONLY the provided context.
-
-Context:
-{retrieved_chunks}
-
-Question:
-{query}
-
-If the answer is not in the context say "insufficient information".
-```
-
-Outputs:
-
-* generated answer
-* source references
-
----
-
-# 17. Web UI (Streamlit)
-
-The prototype includes a Streamlit UI.
-
-Three main pages.
-
-## Upload Data
-
-Users upload enterprise data.
-
-Supported formats:
-
-* CSV
-* Excel
-* PDF
-* Word
-
-Processing display:
-
-```
-✓ File detected
-✓ Structure analyzed
-✓ Vectorization strategy selected
-✓ Embeddings generated
-```
-
----
-
-## Knowledge Base Viewer
-
-Displays vector database information.
-
-Example:
-
-```
-Documents indexed: 12
-Vector entries: 245
-
-Sources:
-report.pdf
-finance.xlsx
-policy.docx
-```
-
----
-
-## Ask the AI Agent
-
-Users ask questions.
-
-UI features:
-
-* query input
-* retrieval mode selection
-* source filtering
-* retrieved chunk visualization
-* AI response display
-
-Example query:
-
-```
-"What were the key findings in the financial report?"
-```
-
----
-
-# 18. Backend API
-
-FastAPI provides endpoints.
-
-Upload endpoint:
-
-```
-POST /upload
-```
-
-Query endpoint:
-
-```
-POST /query
-```
-
-Statistics endpoint:
-
-```
-GET /stats
-```
-
----
-
-# 19. Evaluation Module
-
-The prototype compares two pipelines.
-
-Baseline:
-
-```
-Static vectorization
-```
-
-Proposed:
-
-```
-Adaptive vectorization
-```
-
-Evaluation metrics:
-
-* Recall@k
-* Mean Reciprocal Rank (MRR)
-* grounding accuracy
-* response relevance
-
----
-
-# 20. Development Timeline
-
-Week 1
-Project setup and architecture.
-
-Week 2
-Implement ingestion and parsing modules.
-
-Week 3
-Implement data understanding layer.
-
-Week 4
-Implement vectorization strategy agent.
-
-Week 5
-Implement vector database integration.
-
-Week 6
-Implement retrieval system.
-
-Week 7
-Implement AI reasoning agent.
-
-Week 8
-Implement Streamlit UI and evaluation experiments.
-
----
-
-# 21. Final Prototype Pipeline
-
-```text
-Heterogeneous Data
-      ↓
-Automated Ingestion
-      ↓
-Structure Understanding
-      ↓
-Adaptive Vectorization
-      ↓
-Vector Knowledge Base
-      ↓
-Retrieval-Augmented AI Agent
-      ↓
-Grounded Response
-```
-
-This prototype demonstrates a **fully automated knowledge system capable of transforming heterogeneous data into a knowledge base that AI agents can reason over**.
+Research prototype — Academic use.
