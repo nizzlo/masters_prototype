@@ -141,6 +141,129 @@ TECH_QUERIES: list[TestQuery] = [
 ]
 
 # ---------------------------------------------------------------------------
+# Annual Report queries  (datasets/annual_report.txt)
+# ---------------------------------------------------------------------------
+ANNUAL_REPORT_QUERIES: list[TestQuery] = [
+    TestQuery(
+        query="What was the total revenue for FY2023?",
+        relevant_phrases=["$8.74 billion", "8.74 billion", "total revenue for fy2023", "record revenues"],
+        dataset="annual_report",
+        description="Total FY2023 revenue",
+    ),
+    TestQuery(
+        query="What was the Technology segment EBITDA?",
+        relevant_phrases=["$893 million", "893 million", "Technology Segment EBITDA", "technology segment"],
+        dataset="annual_report",
+        description="Technology segment EBITDA",
+    ),
+    TestQuery(
+        query="What dividend per share was paid to shareholders?",
+        relevant_phrases=["$0.48 per share", "0.48 per share", "dividend of $0.48", "dividend"],
+        dataset="annual_report",
+        description="Dividend per share",
+    ),
+    TestQuery(
+        query="What was the net profit margin?",
+        relevant_phrases=["18.3%", "net profit margin", "net margin"],
+        dataset="annual_report",
+        description="Net profit margin",
+    ),
+    TestQuery(
+        query="What are the principal risk factors identified by the Board?",
+        relevant_phrases=["cybersecurity", "macroeconomic", "supply chain", "talent retention", "risk factor"],
+        dataset="annual_report",
+        description="Principal risk factors",
+    ),
+    TestQuery(
+        query="Who is the Chief Financial Officer?",
+        relevant_phrases=["Rebecca Sung", "Chief Financial Officer", "CFO"],
+        dataset="annual_report",
+        description="CFO identity",
+    ),
+]
+
+# ---------------------------------------------------------------------------
+# Employee Performance queries  (datasets/employee_performance.csv)
+# ---------------------------------------------------------------------------
+EMPLOYEE_PERF_QUERIES: list[TestQuery] = [
+    TestQuery(
+        query="Which Engineering employees have an annual rating above 4.5?",
+        relevant_phrases=["Fatima Al-Hassan", "Sophie Chen", "4.80", "4.60"],
+        dataset="employee_performance",
+        description="High-rated Engineering employees",
+    ),
+    TestQuery(
+        query="Which employees have not completed their required training?",
+        relevant_phrases=["Training_Completed: No"],
+        dataset="employee_performance",
+        description="Training not completed",
+    ),
+    TestQuery(
+        query="What is the base salary of the Finance Director?",
+        relevant_phrases=["Finance Director", "148000", "Claudia Venter"],
+        dataset="employee_performance",
+        description="Finance Director salary",
+    ),
+    TestQuery(
+        query="Which employees report to James O'Brien?",
+        relevant_phrases=["James O'Brien"],
+        dataset="employee_performance",
+        description="James O'Brien's reports",
+    ),
+    TestQuery(
+        query="What is the bonus percentage for the Regional Sales Director?",
+        relevant_phrases=["Regional Sales Director", "Bonus_Pct: 28", "Samuel Adeyemi"],
+        dataset="employee_performance",
+        description="Regional Sales Director bonus",
+    ),
+]
+
+# ---------------------------------------------------------------------------
+# Compliance Manual queries  (datasets/compliance_manual.txt)
+# ---------------------------------------------------------------------------
+COMPLIANCE_QUERIES: list[TestQuery] = [
+    TestQuery(
+        query="What is the maximum GDPR fine for serious infringements?",
+        relevant_phrases=["€20 million", "4% of the total worldwide annual turnover", "gdpr fine", "Tier 2"],
+        dataset="compliance_manual",
+        description="Max GDPR fine",
+    ),
+    TestQuery(
+        query="Within how many hours must a personal data breach be reported to the supervisory authority?",
+        relevant_phrases=["72 hours", "72-hour", "within 72"],
+        dataset="compliance_manual",
+        description="Breach notification window",
+    ),
+    TestQuery(
+        query="How long must financial records be retained?",
+        relevant_phrases=["minimum of 7 years", "7 years", "retained for a minimum"],
+        dataset="compliance_manual",
+        description="Financial records retention period",
+    ),
+    TestQuery(
+        query="How do employees report whistleblowing concerns anonymously?",
+        relevant_phrases=["EthicsLine", "0800-ETHICS", "ethics.meridiangroup.com"],
+        dataset="compliance_manual",
+        description="Anonymous whistleblowing channel",
+    ),
+    TestQuery(
+        query="Who is the Data Protection Officer?",
+        relevant_phrases=["Helen Forsythe", "Data Protection Officer", "DPO"],
+        dataset="compliance_manual",
+        description="DPO identity",
+    ),
+    TestQuery(
+        query="Who is the external auditor and what are their fees?",
+        relevant_phrases=["Deloitte LLP", "external auditor", "$6.2 million"],
+        dataset="compliance_manual",
+        description="External auditor and fees",
+    ),
+]
+
+# ---------------------------------------------------------------------------
 # All queries combined
 # ---------------------------------------------------------------------------
-ALL_QUERIES: list[TestQuery] = HR_QUERIES + INVENTORY_QUERIES + TECH_QUERIES
+ALL_QUERIES: list[TestQuery] = (
+    HR_QUERIES + INVENTORY_QUERIES + TECH_QUERIES
+    + ANNUAL_REPORT_QUERIES + EMPLOYEE_PERF_QUERIES + COMPLIANCE_QUERIES
+)

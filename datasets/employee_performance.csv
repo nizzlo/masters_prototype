@@ -1,0 +1,51 @@
+Employee_ID,Name,Department,Role,Hire_Date,Base_Salary,Bonus_Pct,Q1_Score,Q2_Score,Q3_Score,Q4_Score,Annual_Rating,Training_Completed,Manager
+E001,Alexandra Morrison,Engineering,Senior Software Engineer,2019-03-15,92000,15,4.2,3.9,4.5,4.1,4.18,Yes,David Chen
+E002,Ryan Patel,Engineering,Software Engineer,2021-07-01,75000,10,3.5,3.8,3.6,3.7,3.65,Yes,David Chen
+E003,Fatima Al-Hassan,Engineering,Lead Engineer,2017-06-20,110000,18,4.9,4.7,4.8,4.8,4.80,Yes,David Chen
+E004,Marcus Lee,Engineering,Principal Engineer,2016-01-10,128000,20,4.3,4.5,4.4,4.2,4.35,Yes,David Chen
+E005,Sophie Chen,Engineering,Senior Software Engineer,2020-02-14,95000,15,4.6,4.5,4.7,4.6,4.60,Yes,David Chen
+E006,Daniel Okonkwo,Engineering,Software Engineer,2022-09-05,72000,10,3.2,3.4,3.5,3.3,3.35,Yes,David Chen
+E007,Priya Sharma,Engineering,DevOps Engineer,2020-11-30,88000,12,4.0,3.9,4.1,3.8,3.95,No,David Chen
+E008,James Whitfield,Engineering,Software Engineer,2023-01-16,74000,10,2.8,3.1,3.0,2.9,2.95,Yes,David Chen
+E009,Laura Kim,Engineering,Principal Engineer,2018-04-22,125000,17,4.4,4.2,4.3,4.5,4.35,Yes,David Chen
+E010,Carlos Mendez,Engineering,Senior Software Engineer,2019-08-12,90000,14,3.8,3.9,4.0,4.1,3.95,Yes,David Chen
+E011,Thomas Wright,Marketing,Marketing Manager,2018-10-01,95000,14,4.1,3.9,4.2,4.0,4.05,Yes,Sarah Patel
+E012,Mei-Ling Zhou,Marketing,Content Strategist,2020-05-11,68000,10,4.3,4.5,4.2,4.4,4.35,Yes,Sarah Patel
+E013,Olumide Adeyemi,Marketing,Brand Analyst,2021-03-08,72000,10,3.6,3.7,3.8,3.5,3.65,Yes,Sarah Patel
+E014,Hannah Berg,Marketing,Digital Marketing Lead,2019-11-25,82000,12,4.0,4.1,3.9,4.2,4.05,Yes,Sarah Patel
+E015,Victor Santos,Marketing,Content Strategist,2020-07-19,70000,10,3.9,4.0,4.1,3.8,3.95,Yes,Sarah Patel
+E016,Amara Diallo,Marketing,Brand Analyst,2022-02-14,71000,10,3.4,3.5,3.6,3.3,3.45,Yes,Sarah Patel
+E017,Chris Nakamura,Marketing,Marketing Manager,2017-09-03,93000,13,4.2,4.0,4.1,4.3,4.15,Yes,Sarah Patel
+E018,Jessica Turner,Marketing,Digital Marketing Lead,2021-06-07,80000,12,3.7,3.6,3.8,3.5,3.65,No,Sarah Patel
+E019,Ben Osei,Marketing,Content Strategist,2023-03-20,67000,10,3.0,3.2,3.1,3.3,3.15,Yes,Sarah Patel
+E020,Nina Kowalski,Marketing,Brand Analyst,2020-12-01,73000,10,4.1,4.0,4.2,3.9,4.05,Yes,Sarah Patel
+E021,Rachel Foster,Sales,Account Executive,2020-06-15,65000,20,4.2,4.4,4.3,4.5,4.35,Yes,James O'Brien
+E022,Ahmed Hassan,Sales,Senior Account Executive,2018-02-28,82000,22,4.7,4.8,4.6,4.9,4.75,Yes,James O'Brien
+E023,Tanya Brennan,Sales,Account Executive,2021-10-04,64000,18,3.5,3.8,3.7,3.6,3.65,Yes,James O'Brien
+E024,Leo Park,Sales,Sales Manager,2016-07-18,100000,25,4.5,4.3,4.6,4.4,4.45,Yes,James O'Brien
+E025,Emma Davidson,Sales,Account Executive,2022-04-11,63000,18,3.2,3.4,3.3,3.5,3.35,Yes,James O'Brien
+E026,Omar Farouq,Sales,Senior Account Executive,2019-05-06,84000,22,4.0,4.2,4.1,4.3,4.15,Yes,James O'Brien
+E027,Natalie Ross,Sales,Account Executive,2021-01-25,65000,18,3.9,3.7,4.0,3.8,3.85,Yes,James O'Brien
+E028,Samuel Adeyemi,Sales,Regional Sales Director,2014-09-01,142000,28,4.6,4.5,4.7,4.8,4.65,Yes,James O'Brien
+E029,Yuki Tanaka,Sales,Account Executive,2023-02-13,66000,18,3.1,3.3,3.2,3.4,3.25,Yes,James O'Brien
+E030,Chloe Bennett,Sales,Sales Manager,2017-11-20,98000,24,4.3,4.5,4.4,4.2,4.35,Yes,James O'Brien
+E031,Patrick O'Sullivan,Finance,Financial Analyst,2020-09-07,78000,12,4.0,3.9,4.1,4.2,4.05,Yes,Lisa Nakamura
+E032,Aisha Mohammed,Finance,Senior Financial Analyst,2018-03-14,92000,15,4.4,4.6,4.3,4.5,4.45,Yes,Lisa Nakamura
+E033,George Pearce,Finance,Financial Analyst,2021-08-23,76000,12,3.6,3.7,3.5,3.8,3.65,Yes,Lisa Nakamura
+E034,Zara Ahmed,Finance,Finance Manager,2016-05-30,108000,18,4.1,4.3,4.2,4.0,4.15,Yes,Lisa Nakamura
+E035,Ivan Petrov,Finance,Financial Analyst,2022-01-10,77000,12,3.3,3.4,3.5,3.2,3.35,No,Lisa Nakamura
+E036,Keiko Yamamoto,Finance,Senior Financial Analyst,2019-07-15,94000,15,4.2,4.1,4.4,4.3,4.25,Yes,Lisa Nakamura
+E037,David Okonkwo,Finance,Financial Analyst,2021-04-19,75000,12,3.8,3.9,4.0,3.7,3.85,Yes,Lisa Nakamura
+E038,Claudia Venter,Finance,Finance Director,2012-11-01,148000,25,4.5,4.7,4.6,4.8,4.65,Yes,Lisa Nakamura
+E039,Felix Müller,Finance,Finance Manager,2018-06-04,106000,18,3.9,4.0,4.1,3.8,3.95,Yes,Lisa Nakamura
+E040,Priscilla Nwosu,Finance,Senior Financial Analyst,2020-10-26,91000,14,4.3,4.2,4.4,4.5,4.35,Yes,Lisa Nakamura
+E041,Harriet Blake,Operations,Operations Analyst,2021-05-17,68000,10,4.0,3.8,4.1,4.2,4.03,Yes,Marcus Williams
+E042,Kofi Asante,Operations,Senior Operations Analyst,2019-02-11,84000,13,4.3,4.4,4.2,4.5,4.35,Yes,Marcus Williams
+E043,Irina Volkov,Operations,Operations Analyst,2022-08-29,67000,10,3.5,3.3,3.4,3.6,3.45,No,Marcus Williams
+E044,Bernard Quaye,Operations,Operations Manager,2015-04-07,102000,16,4.6,4.5,4.7,4.4,4.55,Yes,Marcus Williams
+E045,Stephanie Lam,Operations,Operations Analyst,2020-03-23,69000,10,3.7,3.8,3.6,3.9,3.75,Yes,Marcus Williams
+E046,Emmanuel Obi,Operations,Senior Operations Analyst,2018-12-10,83000,12,4.1,4.0,4.2,4.3,4.15,Yes,Marcus Williams
+E047,Miriam Costa,Operations,Operations Analyst,2023-04-03,66000,10,3.2,3.4,3.3,3.1,3.25,Yes,Marcus Williams
+E048,Ranjit Singh,Operations,Operations Manager,2017-08-14,100000,15,4.2,4.3,4.4,4.1,4.25,Yes,Marcus Williams
+E049,Tunde Adebayo,Operations,Senior Operations Analyst,2019-10-28,85000,13,4.5,4.4,4.6,4.3,4.45,Yes,Marcus Williams
+E050,Saoirse Murphy,Operations,Operations Analyst,2021-11-08,68000,10,3.9,3.7,3.8,4.0,3.85,Yes,Marcus Williams

@@ -1,6 +1,6 @@
 """
 Evaluation runner: compares Baseline (fixed chunking) vs Adaptive (strategy-selected)
-vectorization across three test datasets.
+vectorization across six test datasets (3 simple + 3 complex).
 
 Usage:
     python experiments/run_evaluation.py
@@ -33,7 +33,9 @@ from experiments.evaluation_metrics import (
     recall_at_k, precision_at_k, mean_reciprocal_rank
 )
 from experiments.test_queries import (
-    HR_QUERIES, INVENTORY_QUERIES, TECH_QUERIES, ALL_QUERIES, TestQuery
+    HR_QUERIES, INVENTORY_QUERIES, TECH_QUERIES,
+    ANNUAL_REPORT_QUERIES, EMPLOYEE_PERF_QUERIES, COMPLIANCE_QUERIES,
+    ALL_QUERIES, TestQuery
 )
 
 # ── constants ────────────────────────────────────────────────────────────────
@@ -193,9 +195,11 @@ def run_dataset_experiment(
     queries: list[TestQuery],
     embed_client: EmbeddingClient,
     dataset_label: str,
+    rows_per_chunk: int = 5,
 ) -> dict:
     """
     Run baseline and adaptive chunking for a single document, return results.
+    rows_per_chunk controls schema-aware chunking for tabular documents.
     """
     run_id = uuid.uuid4().hex[:6]
     is_tabular = doc.metadata.document_type == DocumentType.TABULAR
@@ -212,10 +216,9 @@ def run_dataset_experiment(
 
     # ── Adaptive: pick chunker based on document type ────────────────────────
     if is_tabular:
-        adaptive_chunker = SchemaChunker(rows_per_chunk=5, include_headers=True)
-        strategy_label   = "SchemaChunker(rows_per_chunk=5, include_headers=True)"
+        adaptive_chunker = SchemaChunker(rows_per_chunk=rows_per_chunk, include_headers=True)
+        strategy_label   = f"SchemaChunker(rows_per_chunk={rows_per_chunk}, include_headers=True)"
     else:
-        # Use smaller, tighter chunks for text — matches settings defaults
         adaptive_chunker = SemanticChunker(
             chunk_size=settings.default_chunk_size,
             chunk_overlap=settings.default_chunk_overlap,
@@ -243,9 +246,7 @@ def _pct(val: float) -> str:
 
 
 def build_report(
-    hr_res: dict,
-    inv_res: dict,
-    tech_res: dict,
+    results_map: dict,   # {label: (res_dict, queries_list)}
     k: int,
     run_timestamp: str,
 ) -> str:
@@ -255,12 +256,11 @@ def build_report(
     sections.append(f"**Embedding model:** `{EMBEDDING_MODEL}`  ")
     sections.append(f"**Retrieval K:** {k}  ")
     sections.append(f"**Baseline config:** chunk_size={BASELINE_CHUNK_SIZE}, overlap={BASELINE_CHUNK_OVERLAP}, strategy=SemanticChunker (all docs)  ")
-    sections.append(f"**Adaptive config:** SemanticChunker(size={settings.default_chunk_size}, overlap={settings.default_chunk_overlap}) for text; SchemaChunker(rows=5) for tabular\n")
+    sections.append(f"**Adaptive config:** SemanticChunker(size={settings.default_chunk_size}, overlap={settings.default_chunk_overlap}) for text; SchemaChunker(rows=N) for tabular\n")
 
     dataset_entries = [
-        ("HR Policy (`hr_policy.txt`)",               hr_res,  HR_QUERIES),
-        ("Product Inventory (`product_inventory.csv`)", inv_res, INVENTORY_QUERIES),
-        ("Technical Manual (`technical_manual.txt`)",  tech_res, TECH_QUERIES),
+        (label, res, queries)
+        for label, (res, queries) in results_map.items()
     ]
 
     # ── summary table ─────────────────────────────────────────────────────
@@ -368,11 +368,18 @@ def build_report(
 
     sections.append("\n---\n")
     sections.append("## Test Dataset Descriptions\n")
-    sections.append("| File | Type | Description | Queries |")
-    sections.append("|------|------|-------------|---------|")
-    sections.append(f"| `datasets/hr_policy.txt` | Text/Document | 8-section HR policy manual covering leave, remote work, performance reviews, training, compensation | {len(HR_QUERIES)} |")
-    sections.append(f"| `datasets/product_inventory.csv` | Tabular/CSV | 30-row product inventory with SKU, name, category, stock, price, reorder level, supplier | {len(INVENTORY_QUERIES)} |")
-    sections.append(f"| `datasets/technical_manual.txt` | Text/Document | 9-section technical manual covering installation, DB config, connectors, troubleshooting, monitoring | {len(TECH_QUERIES)} |")
+    sections.append("| File | Type | Complexity | Description | Queries |")
+    sections.append("|------|------|------------|-------------|---------|")
+    dataset_meta = [
+        ("hr_policy.txt",          "Text",    "Simple",  "8-section HR policy: leave, remote work, reviews, training",           len(HR_QUERIES)),
+        ("product_inventory.csv",  "Tabular", "Simple",  "30 rows × 8 cols: product SKU, stock, price, supplier",                len(INVENTORY_QUERIES)),
+        ("technical_manual.txt",   "Text",    "Simple",  "9-section software manual: install, DB config, troubleshooting",      len(TECH_QUERIES)),
+        ("annual_report.txt",      "Text",    "Complex", "9-section financial annual report with multi-segment financials",      len(ANNUAL_REPORT_QUERIES)),
+        ("employee_performance.csv","Tabular","Complex", "50 rows × 14 cols: employee records with scores, salary, manager",    len(EMPLOYEE_PERF_QUERIES)),
+        ("compliance_manual.txt",  "Text",    "Complex", "5-section compliance manual: GDPR, InfoSec, Finance, Whistleblowing", len(COMPLIANCE_QUERIES)),
+    ]
+    for fname, dtype, complexity, desc, nq in dataset_meta:
+        sections.append(f"| `datasets/{fname}` | {dtype} | {complexity} | {desc} | {nq} |")
     sections.append("")
 
     sections.append("## Baseline Configuration\n")
@@ -386,10 +393,11 @@ def build_report(
 
     sections.append("## Adaptive Configuration\n")
     sections.append("```")
-    sections.append(f"text docs    : SemanticChunker(chunk_size={settings.default_chunk_size}, overlap={settings.default_chunk_overlap})")
-    sections.append(f"tabular docs : SchemaChunker(rows_per_chunk=5, include_headers=True)")
-    sections.append(f"retrieval_k  : {k}")
-    sections.append(f"embedding    : {EMBEDDING_MODEL}")
+    sections.append(f"text docs            : SemanticChunker(chunk_size={settings.default_chunk_size}, overlap={settings.default_chunk_overlap})")
+    sections.append(f"simple tabular (CSV) : SchemaChunker(rows_per_chunk=5, include_headers=True)")
+    sections.append(f"complex tabular (CSV): SchemaChunker(rows_per_chunk=3, include_headers=True)")
+    sections.append(f"retrieval_k          : {k}")
+    sections.append(f"embedding            : {EMBEDDING_MODEL}")
     sections.append("```\n")
 
     return "\n".join(sections)
@@ -400,33 +408,58 @@ def build_report(
 def main():
     print("=" * 60)
     print("  Adaptive vs Baseline Vectorization Evaluation")
+    print("  6 datasets: 3 simple + 3 complex")
     print("=" * 60)
 
     embed_client = EmbeddingClient(model=EMBEDDING_MODEL)
     datasets_dir = ROOT / "datasets"
 
     # ── Load documents ────────────────────────────────────────────────────
-    print("\n[1/4] Loading documents ...")
-    hr_doc   = load_text_document(datasets_dir / "hr_policy.txt",        "hr_policy")
-    inv_doc  = load_csv_document (datasets_dir / "product_inventory.csv", "product_inventory")
-    tech_doc = load_text_document(datasets_dir / "technical_manual.txt",  "technical_manual")
-    print(f"  HR Policy     : {len(hr_doc.content):,} chars")
-    print(f"  Inventory CSV : {inv_doc.metadata.row_count} rows")
-    print(f"  Tech Manual   : {len(tech_doc.content):,} chars")
+    print("\n[1/7] Loading documents ...")
+    hr_doc      = load_text_document(datasets_dir / "hr_policy.txt",           "hr_policy")
+    inv_doc     = load_csv_document (datasets_dir / "product_inventory.csv",    "product_inventory")
+    tech_doc    = load_text_document(datasets_dir / "technical_manual.txt",     "technical_manual")
+    ar_doc      = load_text_document(datasets_dir / "annual_report.txt",        "annual_report")
+    emp_doc     = load_csv_document (datasets_dir / "employee_performance.csv", "employee_performance")
+    comply_doc  = load_text_document(datasets_dir / "compliance_manual.txt",    "compliance_manual")
+    print(f"  HR Policy          : {len(hr_doc.content):,} chars")
+    print(f"  Product Inventory  : {inv_doc.metadata.row_count} rows, {inv_doc.metadata.column_count} cols")
+    print(f"  Technical Manual   : {len(tech_doc.content):,} chars")
+    print(f"  Annual Report      : {len(ar_doc.content):,} chars")
+    print(f"  Employee Perf.     : {emp_doc.metadata.row_count} rows, {emp_doc.metadata.column_count} cols")
+    print(f"  Compliance Manual  : {len(comply_doc.content):,} chars")
 
     # ── Run experiments ───────────────────────────────────────────────────
-    print("\n[2/4] Running HR Policy experiment ...")
+    print("\n[2/7] HR Policy ...")
     hr_res = run_dataset_experiment(hr_doc, HR_QUERIES, embed_client, "HR Policy")
 
-    print("\n[3/4] Running Product Inventory experiment ...")
-    inv_res = run_dataset_experiment(inv_doc, INVENTORY_QUERIES, embed_client, "Product Inventory")
+    print("\n[3/7] Product Inventory ...")
+    inv_res = run_dataset_experiment(inv_doc, INVENTORY_QUERIES, embed_client, "Product Inventory", rows_per_chunk=5)
 
-    print("\n[4/4] Running Technical Manual experiment ...")
+    print("\n[4/7] Technical Manual ...")
     tech_res = run_dataset_experiment(tech_doc, TECH_QUERIES, embed_client, "Technical Manual")
 
+    print("\n[5/7] Annual Report (complex) ...")
+    ar_res = run_dataset_experiment(ar_doc, ANNUAL_REPORT_QUERIES, embed_client, "Annual Report")
+
+    print("\n[6/7] Employee Performance CSV (complex, 50 rows × 14 cols) ...")
+    emp_res = run_dataset_experiment(emp_doc, EMPLOYEE_PERF_QUERIES, embed_client, "Employee Performance", rows_per_chunk=3)
+
+    print("\n[7/7] Compliance Manual (complex) ...")
+    comply_res = run_dataset_experiment(comply_doc, COMPLIANCE_QUERIES, embed_client, "Compliance Manual")
+
     # ── Build and write report ─────────────────────────────────────────────
+    results_map = {
+        "HR Policy (`hr_policy.txt`)":                         (hr_res,     HR_QUERIES),
+        "Product Inventory (`product_inventory.csv`)":         (inv_res,    INVENTORY_QUERIES),
+        "Technical Manual (`technical_manual.txt`)":           (tech_res,   TECH_QUERIES),
+        "Annual Report (`annual_report.txt`) — Complex":       (ar_res,     ANNUAL_REPORT_QUERIES),
+        "Employee Performance (`employee_performance.csv`) — Complex": (emp_res, EMPLOYEE_PERF_QUERIES),
+        "Compliance Manual (`compliance_manual.txt`) — Complex": (comply_res, COMPLIANCE_QUERIES),
+    }
+
     ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    report = build_report(hr_res, inv_res, tech_res, k=RETRIEVAL_K, run_timestamp=ts)
+    report = build_report(results_map, k=RETRIEVAL_K, run_timestamp=ts)
 
     out_path = ROOT / "EVALUATION_RESULTS.md"
     out_path.write_text(report, encoding="utf-8")
@@ -435,14 +468,11 @@ def main():
     print("\n" + "=" * 60)
     print("  RESULTS SUMMARY")
     print("=" * 60)
-    for label, res in [
-        ("HR Policy",          hr_res),
-        ("Product Inventory",  inv_res),
-        ("Technical Manual",   tech_res),
-    ]:
+    for label, (res, _) in results_map.items():
         b = res["baseline"]
         a = res["adaptive"]
-        print(f"\n  {label}")
+        short = label.split("(")[0].strip()
+        print(f"\n  {short}")
         print(f"    Baseline  — chunks:{b['chunk_count']:3d}  MRR:{b['avg_mrr']:.3f}  R@{RETRIEVAL_K}:{b[f'avg_recall@{RETRIEVAL_K}']:.3f}  P@{RETRIEVAL_K}:{b[f'avg_precision@{RETRIEVAL_K}']:.3f}")
         print(f"    Adaptive  — chunks:{a['chunk_count']:3d}  MRR:{a['avg_mrr']:.3f}  R@{RETRIEVAL_K}:{a[f'avg_recall@{RETRIEVAL_K}']:.3f}  P@{RETRIEVAL_K}:{a[f'avg_precision@{RETRIEVAL_K}']:.3f}")
 

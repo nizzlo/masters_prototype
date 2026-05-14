@@ -1,0 +1,132 @@
+# Meridian Group plc — Annual Report & Accounts FY2023
+
+---
+
+## 1. Executive Summary
+
+Meridian Group plc delivered another year of strong financial performance in FY2023, achieving record revenues of **$8.74 billion**, representing growth of **14.2%** versus FY2022 ($7.65 billion). Our three operating segments — Technology, Healthcare, and Consumer Goods — all grew year-on-year, with Technology outperforming expectations. Net income reached **$1.60 billion**, yielding a **net profit margin of 18.3%**, up from 17.1% in the prior year.
+
+Group EBITDA grew to **$2.14 billion** (EBITDA margin: 24.5%), driven by disciplined cost management and operational leverage across the Technology segment. Basic **earnings per share (EPS) was $2.84**, compared to $2.41 in FY2022. The Board is pleased to declare a final **dividend of $0.48 per share** (FY2022: $0.42), reflecting confidence in the Group's long-term earnings capacity.
+
+Chief Executive **Charles Whitmore** commented: "FY2023 has demonstrated the strength of our diversified business model. The strategic investments we made in cloud infrastructure and data analytics capabilities are now delivering measurable returns."
+
+---
+
+## 2. FY2023 Financial Highlights
+
+| Metric | FY2023 | FY2022 | Change |
+|--------|--------|--------|--------|
+| Total Revenue | $8.74B | $7.65B | +14.2% |
+| Gross Profit | $4.37B | $3.74B | +16.8% |
+| EBITDA | $2.14B | $1.83B | +16.9% |
+| EBIT | $1.86B | $1.57B | +18.5% |
+| Net Income | $1.60B | $1.31B | +22.1% |
+| Net Profit Margin | 18.3% | 17.1% | +1.2 pp |
+| Basic EPS | $2.84 | $2.41 | +17.8% |
+| Dividend per Share | $0.48 | $0.42 | +14.3% |
+| Return on Invested Capital (ROIC) | 16.8% | 15.2% | +1.6 pp |
+| Free Cash Flow (FCF) | $1.33B | $1.10B | +20.9% |
+
+The Group ended FY2023 with **cash and cash equivalents of $2.3 billion**. Total debt stood at **$3.8 billion**, resulting in net debt of **$1.5 billion** and a net leverage ratio of 0.7x EBITDA — comfortably within our target range of below 1.5x.
+
+---
+
+## 3. Technology Segment Review
+
+The Technology segment continued to be Meridian's growth engine, generating **revenue of $3.82 billion** in FY2023, a year-on-year increase of **22.1%** (FY2022: $3.13 billion). The segment benefited from strong demand for cloud migration services and enterprise software licensing.
+
+**Technology Segment EBITDA was $893 million**, representing a margin of 23.4% (FY2022: $658 million, 21.0%). The improvement in margin reflects the shift towards higher-margin recurring software revenues, which now represent 62% of segment revenue (FY2022: 54%).
+
+Key Technology segment achievements in FY2023:
+- Secured 14 large enterprise contracts with average annual contract value exceeding $40 million
+- Cloud services revenue grew 38% to $1.42 billion
+- Headcount expanded by 1,840 to reach 18,200 globally
+- Launched DataPilot AI platform, generating $120 million in first-year revenue
+- Acquired NexGen Analytics for $340 million (completed July 2023)
+
+The Technology segment accounted for 43.7% of Group revenue and 41.7% of Group EBITDA.
+
+---
+
+## 4. Healthcare Segment Review
+
+The Healthcare segment delivered steady growth with **revenue of $2.91 billion** (FY2022: $2.60 billion), representing **growth of 11.8%**. Revenue was driven by strong performance in diagnostic imaging equipment and pharmaceutical supply chain services.
+
+**Healthcare segment EBITDA was $698 million** (margin: 24.0%), compared to $618 million (23.8%) in FY2022. Margin improvement was driven by pricing power in diagnostic equipment and operating efficiency gains from the segment's operational excellence programme.
+
+Key Healthcare segment highlights:
+- Regulatory approval received for three new diagnostic products in the EU and US markets
+- Pharmaceutical supply chain revenue grew 18% to $980 million
+- Signed a 5-year exclusive supply agreement with MedGroup International, estimated value $1.8 billion
+- Initiated clinical trials for BioScan Pro platform (results expected Q3 FY2024)
+- Divested non-core rehabilitation services division for $145 million (August 2023)
+
+The Healthcare segment represented 33.3% of Group revenue.
+
+---
+
+## 5. Consumer Goods Segment Review
+
+The Consumer Goods segment faced a more challenging trading environment due to persistent consumer price sensitivity and elevated input costs. Revenue was **$2.01 billion** (FY2022: $1.91 billion), representing **growth of 5.4%**. Organic growth was 3.2%; the remaining 2.2% came from the bolt-on acquisition of NaturalBrew Ltd (completed February 2023).
+
+**Consumer Goods segment EBITDA was $241 million** (margin: 11.9%), down from 13.1% in FY2022, reflecting higher raw material costs and investment in brand repositioning.
+
+Key Consumer Goods actions taken in FY2023:
+- Launched premium product tier across five core categories, contributing $180 million in incremental revenue
+- Restructured European distribution network, generating annualised savings of $28 million
+- Reduced packaging material costs by 9% through supply chain renegotiation
+- E-commerce channel grew to 31% of Consumer Goods revenue (FY2022: 24%)
+
+---
+
+## 6. Balance Sheet and Cash Flow
+
+The Group maintained a **strong balance sheet** throughout FY2023. Total assets at year-end were $14.2 billion (FY2022: $12.7 billion). The increase reflects the NexGen Analytics acquisition ($340 million goodwill) and continued capital investment.
+
+**Operating cash flow was $1.95 billion** (FY2022: $1.68 billion), reflecting strong conversion of profits into cash. Capital expenditure totalled **$620 million** (FY2022: $580 million), of which 58% was invested in Technology infrastructure. Free cash flow of **$1.33 billion** was used to fund the dividend ($270 million), acquisitions ($340 million for NexGen), and debt repayment ($180 million).
+
+Net debt closed the year at **$1.5 billion** (0.7x EBITDA), down from $1.8 billion at FY2022 year-end. The Group has a $1.5 billion revolving credit facility, undrawn at year-end.
+
+Chief Financial Officer **Rebecca Sung** noted: "Our cash generation remains a key competitive advantage, enabling us to invest for growth while maintaining a strong balance sheet and increasing returns to shareholders."
+
+---
+
+## 7. Risk Factors
+
+The Board has identified the following as principal risks for the Group:
+
+**Macroeconomic and market risk.** Sustained inflationary pressures, rising interest rates, and slowing global economic growth could reduce enterprise technology spend and consumer purchasing power. The Group actively monitors demand indicators and maintains pricing flexibility.
+
+**Cybersecurity and data protection risk.** The Group processes significant volumes of sensitive customer and patient data. A cyber attack or data breach could result in financial penalties, reputational damage, and operational disruption. The Board has approved a $120 million cybersecurity investment programme over FY2024–FY2025.
+
+**Healthcare regulatory risk.** Changes to FDA, EMA, or MHRA approval processes, pricing regulations, or reimbursement policies could adversely affect Healthcare segment revenue. Three products are currently pending regulatory approval.
+
+**Supply chain disruption risk.** Concentration of critical component supply in certain geographies creates vulnerability to geopolitical or logistical disruptions. The Group has implemented dual-sourcing for the top 50 critical components.
+
+**Talent retention risk.** Competition for technology talent remains intense. The Group's ability to attract, develop, and retain skilled engineers, data scientists, and sales professionals is critical to the Technology segment's growth plans.
+
+**Acquisition integration risk.** The NexGen Analytics acquisition must be successfully integrated to deliver the expected synergies of $65 million per annum by FY2026.
+
+---
+
+## 8. Corporate Governance
+
+The Board of Meridian Group plc comprises 10 directors: the Executive Chairman **Sir Geoffrey Hartwell**, Chief Executive **Charles Whitmore**, Chief Financial Officer **Rebecca Sung**, and seven independent non-executive directors. The Board met 12 times during FY2023.
+
+The Audit Committee, chaired by **Dame Patricia Hollis**, reviewed internal controls, financial reporting, and the external audit process. The external auditor, **PricewaterhouseCoopers LLP**, has served as Group auditor for six years. Audit fees for FY2023 were $8.4 million.
+
+The Remuneration Committee approved an Executive Bonus Plan payout of 87% of maximum for FY2023, reflecting strong financial performance partly offset by the Consumer Goods margin decline. Long-term incentive plan (LTIP) awards vested at 92% based on three-year EPS and ROIC targets.
+
+---
+
+## 9. FY2024 Outlook
+
+The Board enters FY2024 with confidence. For the full year FY2024, Meridian expects:
+- Group revenue growth of **10–13%**
+- EBITDA margin in the range of **24–25%**
+- Capital expenditure of approximately **$680 million**
+- Effective tax rate of approximately **22%**
+
+The Technology segment is expected to continue outperforming, supported by the DataPilot AI platform and full-year contribution from NexGen Analytics. Healthcare will benefit from the new MedGroup supply agreement. Consumer Goods will focus on margin recovery through pricing actions and cost efficiency.
+
+The Group maintains its commitment to progressive dividends and expects to grow the FY2024 dividend by at least 10%.
