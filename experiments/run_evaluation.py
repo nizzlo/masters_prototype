@@ -406,57 +406,79 @@ def build_report(
 # ── main ─────────────────────────────────────────────────────────────────────
 
 def main():
+    import os
+
+    # EVAL_MODE can be set by test.sh: "all" (default), "simple", or "complex"
+    mode = os.environ.get("EVAL_MODE", "all").lower()
+    run_simple  = mode in ("all", "simple")
+    run_complex = mode in ("all", "complex")
+
+    dataset_count = (3 if run_simple else 0) + (3 if run_complex else 0)
+    mode_label = {"all": "3 simple + 3 complex", "simple": "3 simple only", "complex": "3 complex only"}.get(mode, mode)
+
     print("=" * 60)
     print("  Adaptive vs Baseline Vectorization Evaluation")
-    print("  6 datasets: 3 simple + 3 complex")
+    print(f"  {dataset_count} datasets: {mode_label}")
     print("=" * 60)
 
     embed_client = EmbeddingClient(model=EMBEDDING_MODEL)
     datasets_dir = ROOT / "datasets"
 
+    results_map: dict = {}
+    step = 1
+    total = dataset_count + 1  # +1 for the loading step
+
     # ── Load documents ────────────────────────────────────────────────────
-    print("\n[1/7] Loading documents ...")
-    hr_doc      = load_text_document(datasets_dir / "hr_policy.txt",           "hr_policy")
-    inv_doc     = load_csv_document (datasets_dir / "product_inventory.csv",    "product_inventory")
-    tech_doc    = load_text_document(datasets_dir / "technical_manual.txt",     "technical_manual")
-    ar_doc      = load_text_document(datasets_dir / "annual_report.txt",        "annual_report")
-    emp_doc     = load_csv_document (datasets_dir / "employee_performance.csv", "employee_performance")
-    comply_doc  = load_text_document(datasets_dir / "compliance_manual.txt",    "compliance_manual")
-    print(f"  HR Policy          : {len(hr_doc.content):,} chars")
-    print(f"  Product Inventory  : {inv_doc.metadata.row_count} rows, {inv_doc.metadata.column_count} cols")
-    print(f"  Technical Manual   : {len(tech_doc.content):,} chars")
-    print(f"  Annual Report      : {len(ar_doc.content):,} chars")
-    print(f"  Employee Perf.     : {emp_doc.metadata.row_count} rows, {emp_doc.metadata.column_count} cols")
-    print(f"  Compliance Manual  : {len(comply_doc.content):,} chars")
+    print(f"\n[{step}/{total}] Loading documents ...")
+    step += 1
+
+    if run_simple:
+        hr_doc   = load_text_document(datasets_dir / "hr_policy.txt",        "hr_policy")
+        inv_doc  = load_csv_document (datasets_dir / "product_inventory.csv", "product_inventory")
+        tech_doc = load_text_document(datasets_dir / "technical_manual.txt",  "technical_manual")
+        print(f"  HR Policy          : {len(hr_doc.content):,} chars")
+        print(f"  Product Inventory  : {inv_doc.metadata.row_count} rows, {inv_doc.metadata.column_count} cols")
+        print(f"  Technical Manual   : {len(tech_doc.content):,} chars")
+
+    if run_complex:
+        ar_doc     = load_text_document(datasets_dir / "annual_report.txt",        "annual_report")
+        emp_doc    = load_csv_document (datasets_dir / "employee_performance.csv",  "employee_performance")
+        comply_doc = load_text_document(datasets_dir / "compliance_manual.txt",     "compliance_manual")
+        print(f"  Annual Report      : {len(ar_doc.content):,} chars")
+        print(f"  Employee Perf.     : {emp_doc.metadata.row_count} rows, {emp_doc.metadata.column_count} cols")
+        print(f"  Compliance Manual  : {len(comply_doc.content):,} chars")
 
     # ── Run experiments ───────────────────────────────────────────────────
-    print("\n[2/7] HR Policy ...")
-    hr_res = run_dataset_experiment(hr_doc, HR_QUERIES, embed_client, "HR Policy")
+    if run_simple:
+        print(f"\n[{step}/{total}] HR Policy ...")
+        step += 1
+        hr_res = run_dataset_experiment(hr_doc, HR_QUERIES, embed_client, "HR Policy")
+        results_map["HR Policy (`hr_policy.txt`)"] = (hr_res, HR_QUERIES)
 
-    print("\n[3/7] Product Inventory ...")
-    inv_res = run_dataset_experiment(inv_doc, INVENTORY_QUERIES, embed_client, "Product Inventory", rows_per_chunk=5)
+        print(f"\n[{step}/{total}] Product Inventory ...")
+        step += 1
+        inv_res = run_dataset_experiment(inv_doc, INVENTORY_QUERIES, embed_client, "Product Inventory", rows_per_chunk=5)
+        results_map["Product Inventory (`product_inventory.csv`)"] = (inv_res, INVENTORY_QUERIES)
 
-    print("\n[4/7] Technical Manual ...")
-    tech_res = run_dataset_experiment(tech_doc, TECH_QUERIES, embed_client, "Technical Manual")
+        print(f"\n[{step}/{total}] Technical Manual ...")
+        step += 1
+        tech_res = run_dataset_experiment(tech_doc, TECH_QUERIES, embed_client, "Technical Manual")
+        results_map["Technical Manual (`technical_manual.txt`)"] = (tech_res, TECH_QUERIES)
 
-    print("\n[5/7] Annual Report (complex) ...")
-    ar_res = run_dataset_experiment(ar_doc, ANNUAL_REPORT_QUERIES, embed_client, "Annual Report")
+    if run_complex:
+        print(f"\n[{step}/{total}] Annual Report (complex) ...")
+        step += 1
+        ar_res = run_dataset_experiment(ar_doc, ANNUAL_REPORT_QUERIES, embed_client, "Annual Report")
+        results_map["Annual Report (`annual_report.txt`) — Complex"] = (ar_res, ANNUAL_REPORT_QUERIES)
 
-    print("\n[6/7] Employee Performance CSV (complex, 50 rows × 14 cols) ...")
-    emp_res = run_dataset_experiment(emp_doc, EMPLOYEE_PERF_QUERIES, embed_client, "Employee Performance", rows_per_chunk=3)
+        print(f"\n[{step}/{total}] Employee Performance CSV (complex, 50 rows × 14 cols) ...")
+        step += 1
+        emp_res = run_dataset_experiment(emp_doc, EMPLOYEE_PERF_QUERIES, embed_client, "Employee Performance", rows_per_chunk=3)
+        results_map["Employee Performance (`employee_performance.csv`) — Complex"] = (emp_res, EMPLOYEE_PERF_QUERIES)
 
-    print("\n[7/7] Compliance Manual (complex) ...")
-    comply_res = run_dataset_experiment(comply_doc, COMPLIANCE_QUERIES, embed_client, "Compliance Manual")
-
-    # ── Build and write report ─────────────────────────────────────────────
-    results_map = {
-        "HR Policy (`hr_policy.txt`)":                         (hr_res,     HR_QUERIES),
-        "Product Inventory (`product_inventory.csv`)":         (inv_res,    INVENTORY_QUERIES),
-        "Technical Manual (`technical_manual.txt`)":           (tech_res,   TECH_QUERIES),
-        "Annual Report (`annual_report.txt`) — Complex":       (ar_res,     ANNUAL_REPORT_QUERIES),
-        "Employee Performance (`employee_performance.csv`) — Complex": (emp_res, EMPLOYEE_PERF_QUERIES),
-        "Compliance Manual (`compliance_manual.txt`) — Complex": (comply_res, COMPLIANCE_QUERIES),
-    }
+        print(f"\n[{step}/{total}] Compliance Manual (complex) ...")
+        comply_res = run_dataset_experiment(comply_doc, COMPLIANCE_QUERIES, embed_client, "Compliance Manual")
+        results_map["Compliance Manual (`compliance_manual.txt`) — Complex"] = (comply_res, COMPLIANCE_QUERIES)
 
     ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     report = build_report(results_map, k=RETRIEVAL_K, run_timestamp=ts)

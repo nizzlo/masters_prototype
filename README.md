@@ -226,6 +226,7 @@ masters_prototype/
 ├── main.py                     # CLI entry point
 ├── run.sh                      # Start all services
 ├── stop.sh                     # Stop all services
+├── test.sh                     # Run evaluation test suite
 └── requirements.txt            # Dependencies
 ```
 
@@ -272,7 +273,7 @@ The system automatically selects the optimal chunking strategy based on document
 
 ## Running the Evaluation Test Suite
 
-The evaluation suite benchmarks **Baseline (fixed chunking)** against **Adaptive (strategy-selected chunking)** across three sample datasets.
+The evaluation suite benchmarks **Baseline (fixed chunking)** against **Adaptive (strategy-selected chunking)** across six datasets (3 simple + 3 complex).
 
 ### Test Datasets
 
@@ -281,33 +282,34 @@ The evaluation suite benchmarks **Baseline (fixed chunking)** against **Adaptive
 | `datasets/hr_policy.txt` | Text | 8-section HR policy manual |
 | `datasets/product_inventory.csv` | Tabular | 30-row product inventory (8 columns) |
 | `datasets/technical_manual.txt` | Text | 9-section software technical manual |
+| `datasets/annual_report.txt` | Text | Multi-segment financial annual report (9 sections) |
+| `datasets/employee_performance.csv` | Tabular | 50-row employee records (14 columns) |
+| `datasets/compliance_manual.txt` | Text | GDPR / InfoSec / Audit compliance manual (5 sections) |
 
-### Prerequisites
-
-Ollama must be running with the embedding model pulled:
+### Run with `test.sh` (recommended)
 
 ```bash
-ollama serve                    # if not already running
-ollama pull mxbai-embed-large   # if not already pulled
+./test.sh              # run all 6 datasets  (~20s)
+./test.sh --simple     # run 3 simple datasets only  (~8s)
+./test.sh --complex    # run 3 complex datasets only (~12s)
+./test.sh --help       # show usage
 ```
 
-### Run the Evaluation
+`test.sh` will:
+- Verify Ollama is running and start it automatically if not
+- Check that `mxbai-embed-large` is available and pull it if missing
+- Run the evaluation and time the total duration
+- Print the results summary to the console
+- Write the full report to **`EVALUATION_RESULTS.md`**
+
+### Run directly with Python
 
 ```bash
-# Activate the virtual environment
+# Activate the virtual environment first
 source .venv/bin/activate   # Windows: .venv\Scripts\activate
 
-# Run all experiments
 python experiments/run_evaluation.py
 ```
-
-The script will:
-1. Load each dataset and chunk it with both approaches
-2. Embed all chunks using `mxbai-embed-large` into isolated ChromaDB collections
-3. Run 17 ground-truth queries across the three datasets
-4. Compute Recall@1/3/5, Precision@5, MRR, and per-query latency
-5. Print a summary table to the console
-6. Write the full report to **`EVALUATION_RESULTS.md`**
 
 ### Configuration
 
@@ -333,7 +335,7 @@ TestQuery(
 )
 ```
 
-A retrieved chunk is marked relevant if its content contains **any** of the `relevant_phrases` (case-insensitive). Add new queries to `HR_QUERIES`, `INVENTORY_QUERIES`, or `TECH_QUERIES` — they are automatically picked up by the runner.
+A retrieved chunk is marked relevant if its content contains **any** of the `relevant_phrases` (case-insensitive). Add new queries to any of the six query lists (`HR_QUERIES`, `INVENTORY_QUERIES`, `TECH_QUERIES`, `ANNUAL_REPORT_QUERIES`, `EMPLOYEE_PERF_QUERIES`, `COMPLIANCE_QUERIES`) — they are automatically picked up by the runner.
 
 ---
 
