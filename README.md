@@ -270,6 +270,73 @@ The system automatically selects the optimal chunking strategy based on document
 
 ---
 
+## Running the Evaluation Test Suite
+
+The evaluation suite benchmarks **Baseline (fixed chunking)** against **Adaptive (strategy-selected chunking)** across three sample datasets.
+
+### Test Datasets
+
+| File | Type | Content |
+|------|------|---------|
+| `datasets/hr_policy.txt` | Text | 8-section HR policy manual |
+| `datasets/product_inventory.csv` | Tabular | 30-row product inventory (8 columns) |
+| `datasets/technical_manual.txt` | Text | 9-section software technical manual |
+
+### Prerequisites
+
+Ollama must be running with the embedding model pulled:
+
+```bash
+ollama serve                    # if not already running
+ollama pull mxbai-embed-large   # if not already pulled
+```
+
+### Run the Evaluation
+
+```bash
+# Activate the virtual environment
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
+
+# Run all experiments
+python experiments/run_evaluation.py
+```
+
+The script will:
+1. Load each dataset and chunk it with both approaches
+2. Embed all chunks using `mxbai-embed-large` into isolated ChromaDB collections
+3. Run 17 ground-truth queries across the three datasets
+4. Compute Recall@1/3/5, Precision@5, MRR, and per-query latency
+5. Print a summary table to the console
+6. Write the full report to **`EVALUATION_RESULTS.md`**
+
+### Configuration
+
+The evaluation parameters are set at the top of `experiments/run_evaluation.py`:
+
+| Parameter | Value | Description |
+|-----------|-------|-------------|
+| `BASELINE_CHUNK_SIZE` | `512` | Fixed chunk size (chars) for baseline |
+| `BASELINE_CHUNK_OVERLAP` | `50` | Overlap (chars) for baseline |
+| `RETRIEVAL_K` | `5` | Top-K results retrieved per query |
+| `EMBEDDING_MODEL` | `mxbai-embed-large` | Ollama embedding model |
+
+### Add or Edit Queries
+
+Ground-truth queries are defined in `experiments/test_queries.py`. Each `TestQuery` specifies:
+
+```python
+TestQuery(
+    query="How many annual leave days are employees entitled to?",
+    relevant_phrases=["20 days of annual leave", "annual leave"],  # substring match
+    dataset="hr_policy",
+    description="Annual leave entitlement",
+)
+```
+
+A retrieved chunk is marked relevant if its content contains **any** of the `relevant_phrases` (case-insensitive). Add new queries to `HR_QUERIES`, `INVENTORY_QUERIES`, or `TECH_QUERIES` — they are automatically picked up by the runner.
+
+---
+
 ## Development
 
 See [IMPLEMENTATION.md](IMPLEMENTATION.md) for technical implementation details.
