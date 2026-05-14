@@ -1,0 +1,72 @@
+# Employee Handbook — HR Policy Manual
+## Acme Corporation | Effective January 2024
+
+---
+
+## 1. Annual Leave Policy
+
+All full-time employees are entitled to 20 days of annual leave per calendar year. Part-time employees receive annual leave on a pro-rata basis calculated from their contracted hours. Leave entitlement begins accruing from the first day of employment. Unused annual leave can be carried forward up to a maximum of 5 days to the following year. Any remaining balance beyond 5 days will be forfeited at year-end.
+
+New employees completing their probationary period (90 days) will have their leave entitlement prorated for the remainder of the calendar year. Leave requests must be submitted through the HR portal at least 5 business days in advance for periods up to 5 days, and at least 15 business days in advance for leave lasting more than 5 consecutive days.
+
+---
+
+## 2. Sick Leave Policy
+
+Employees are entitled to 10 sick days per calendar year. Sick leave resets on January 1 and does not carry forward. For absences lasting more than 3 consecutive days, a medical certificate from a registered practitioner is required. Sick leave is paid at the standard rate of 100% of base salary for the first 10 days. For extended illnesses beyond 10 days, the long-term illness policy applies, providing 60% of base salary for up to 90 days.
+
+Employees must notify their direct manager before 9:00 AM on the day of absence. Repeated short-term sick leave patterns may trigger a formal wellbeing review.
+
+---
+
+## 3. Remote Work Policy
+
+Acme Corporation supports a hybrid working model. Employees in eligible roles may work remotely up to 3 days per week, with a minimum of 2 days per week in the office required. Remote work arrangements must be approved by the employee's direct manager and documented in the HR system.
+
+All remote workers must maintain a suitable home office environment, including a stable internet connection of at least 20 Mbps and a dedicated workspace free from significant distractions. Company equipment must be used for all work activities. Employees must be available during core business hours (9:00 AM – 3:00 PM, local time) and must join video calls with cameras enabled unless otherwise agreed.
+
+Employees on probation are not eligible for remote work until they complete their 90-day probationary period. Remote working privileges may be suspended in cases of performance concerns.
+
+---
+
+## 4. Performance Review Policy
+
+Performance reviews are conducted bi-annually: mid-year reviews in June and annual reviews in December. All employees must complete a self-assessment prior to their review meeting. The self-assessment form is available on the HR portal and must be submitted at least 3 business days before the scheduled review.
+
+Ratings are assigned on a five-point scale: Exceptional (5), Exceeds Expectations (4), Meets Expectations (3), Partially Meets Expectations (2), and Does Not Meet Expectations (1). Employees rated 3 or above are eligible for the annual merit increase. Employees rated 2 are placed on a 60-day performance improvement plan (PIP). Employees rated 1 are subject to further disciplinary review.
+
+Managers must complete their review documentation within 5 business days of the review meeting and submit it to HR for approval.
+
+---
+
+## 5. Training and Development
+
+Acme Corporation allocates a training budget of $1,500 per employee per year for professional development activities. This budget can be used for approved external courses, certifications, conference attendance, and professional memberships. Requests for training expenditure must be approved by the line manager and submitted to HR at least 10 business days before the training date.
+
+All employees are required to complete mandatory annual training covering: Data Privacy and GDPR, Information Security Awareness, and Workplace Health and Safety. These courses are hosted on the internal learning management system (LMS) and must be completed before December 31 each year.
+
+---
+
+## 6. Code of Conduct
+
+All employees are expected to behave in a professional, ethical, and respectful manner at all times. Harassment, discrimination, and bullying of any kind will not be tolerated and may result in immediate termination. Employees must avoid conflicts of interest and must declare any potential conflicts to their manager and HR in writing.
+
+Confidential information, including business plans, financial data, client details, and intellectual property, must not be shared outside the company without prior written approval. Violation of confidentiality obligations is a serious disciplinary offence.
+
+---
+
+## 7. Compensation and Benefits
+
+Base salaries are reviewed annually as part of the December performance review cycle. Merit increases are awarded to employees who meet or exceed expectations and are effective from January 1 of the following year. The merit increase pool is set annually by the Board and typically ranges from 2% to 5%.
+
+Employees are enrolled in the company pension scheme from day one. Acme contributes 5% of gross salary; employees are required to contribute a minimum of 3%. Additional voluntary contributions can be made directly through payroll.
+
+Health insurance coverage is provided to all full-time employees at no cost. Dependants can be added to the health plan at the employee's expense.
+
+---
+
+## 8. Grievance Procedure
+
+Employees who have a workplace grievance should first attempt to resolve it informally by speaking directly with their manager. If the informal resolution is unsuccessful within 10 business days, the employee may raise a formal grievance by submitting the Grievance Form to HR. HR will acknowledge the grievance within 2 business days and appoint an investigating manager within 5 business days.
+
+The investigation will be completed within 20 business days. All parties involved are entitled to be accompanied by a colleague or trade union representative during formal meetings. The outcome of the investigation will be communicated in writing.

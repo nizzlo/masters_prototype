@@ -1,0 +1,252 @@
+# DataFlow Platform — Technical Manual
+## Version 2.4.0 | Last Updated: March 2024
+
+---
+
+## 1. Introduction
+
+DataFlow is an open-source data pipeline orchestration platform designed for high-throughput ETL workloads. It supports connectors for over 50 data sources and destinations, real-time streaming via Apache Kafka, and a declarative YAML-based pipeline configuration. This manual covers installation, configuration, operation, and troubleshooting for DataFlow version 2.4.0.
+
+---
+
+## 2. System Requirements
+
+Before installing DataFlow, ensure your environment meets the following minimum requirements:
+
+**Hardware Requirements (Minimum):**
+- CPU: 4 cores (x86_64 or ARM64)
+- RAM: 8 GB (16 GB recommended for production)
+- Disk: 20 GB available storage (SSD recommended)
+- Network: 100 Mbps Ethernet
+
+**Hardware Requirements (Recommended for Production):**
+- CPU: 16 cores
+- RAM: 32 GB
+- Disk: 500 GB NVMe SSD
+- Network: 1 Gbps Ethernet
+
+**Software Requirements:**
+- Operating System: Ubuntu 22.04 LTS, Debian 12, CentOS 9, or macOS 13+
+- Python: 3.10 or higher (3.11 recommended)
+- Docker: 24.0 or higher (for containerised deployment)
+- PostgreSQL: 14 or higher (for metadata storage)
+- Java: JDK 17 (required for Kafka connector)
+
+---
+
+## 3. Installation
+
+### 3.1 Install via pip
+
+The simplest installation method uses pip:
+
+```bash
+pip install dataflow-platform==2.4.0
+```
+
+After installation, initialise the platform:
+
+```bash
+dataflow init --workspace /opt/dataflow
+```
+
+### 3.2 Install via Docker
+
+Pull the official Docker image:
+
+```bash
+docker pull dataflow/platform:2.4.0
+```
+
+Run the container:
+
+```bash
+docker run -d \
+  --name dataflow \
+  -p 8080:8080 \
+  -v /opt/dataflow/data:/data \
+  -e DATABASE_URL=postgresql://user:password@host:5432/dataflow \
+  dataflow/platform:2.4.0
+```
+
+### 3.3 Install via Helm (Kubernetes)
+
+Add the DataFlow Helm repository:
+
+```bash
+helm repo add dataflow https://charts.dataflow.io
+helm repo update
+```
+
+Install the chart:
+
+```bash
+helm install dataflow dataflow/dataflow \
+  --namespace dataflow \
+  --create-namespace \
+  --set database.url=postgresql://user:password@host:5432/dataflow \
+  --set replicaCount=3
+```
+
+---
+
+## 4. Database Configuration
+
+DataFlow requires a PostgreSQL database for storing pipeline metadata, run history, and connector configurations.
+
+### 4.1 Connection String Format
+
+The database connection is specified via the `DATABASE_URL` environment variable:
+
+```
+DATABASE_URL=postgresql://username:password@hostname:port/database_name
+```
+
+Example:
+
+```
+DATABASE_URL=postgresql://dataflow:s3cur3pass@localhost:5432/dataflow_db
+```
+
+### 4.2 Creating the Database
+
+Create the database and user in PostgreSQL:
+
+```sql
+CREATE USER dataflow WITH PASSWORD 's3cur3pass';
+CREATE DATABASE dataflow_db OWNER dataflow;
+GRANT ALL PRIVILEGES ON DATABASE dataflow_db TO dataflow;
+```
+
+### 4.3 Running Migrations
+
+After setting the `DATABASE_URL`, run database migrations:
+
+```bash
+dataflow db migrate
+```
+
+This creates all required tables and seeds the default configuration. Re-running this command on an existing database is safe — it applies only pending migrations.
+
+---
+
+## 5. Pipeline Configuration
+
+Pipelines are defined using YAML configuration files. A pipeline consists of a source, optional transformations, and a destination.
+
+### 5.1 Basic Pipeline Example
+
+```yaml
+pipeline:
+  name: sales_data_sync
+  schedule: "0 */6 * * *"   # every 6 hours
+  source:
+    type: postgresql
+    connection: "${DATABASE_URL}"
+    query: "SELECT * FROM sales WHERE updated_at > '{{last_run_time}}'"
+  transformations:
+    - type: rename_columns
+      mappings:
+        customer_id: customerId
+        created_at: createdAt
+    - type: filter
+      condition: "amount > 0"
+  destination:
+    type: bigquery
+    project: my-gcp-project
+    dataset: analytics
+    table: sales_fact
+    write_mode: append
+```
+
+### 5.2 Environment Variables in Pipelines
+
+Use `${ENV_VAR}` syntax to reference environment variables in pipeline YAML. This prevents credentials from being hardcoded in configuration files.
+
+---
+
+## 6. Connectors
+
+DataFlow ships with built-in connectors for the following systems:
+
+**Sources:** PostgreSQL, MySQL, MongoDB, S3, Google Sheets, REST API, Kafka, Salesforce, Snowflake
+**Destinations:** BigQuery, Redshift, Snowflake, S3, PostgreSQL, Kafka, Elasticsearch, Webhook
+
+Each connector requires specific configuration parameters. Refer to the Connectors Reference at docs.dataflow.io/connectors for detailed parameter documentation.
+
+---
+
+## 7. Troubleshooting
+
+### 7.1 Connection Refused Error
+
+**Symptom:** `ConnectionRefusedError: [Errno 111] Connection refused` when starting the server.
+
+**Cause:** The database is unreachable. Verify the `DATABASE_URL` is correct and the PostgreSQL server is running.
+
+**Fix:**
+```bash
+# Test database connectivity
+psql $DATABASE_URL -c "SELECT 1"
+
+# Check DataFlow configuration
+dataflow config show
+```
+
+### 7.2 Out of Memory Error
+
+**Symptom:** `MemoryError` or OOM-kill during large pipeline runs.
+
+**Cause:** Insufficient RAM for the data volume being processed.
+
+**Fix:** Increase memory allocation (Docker: `--memory=16g`), reduce batch size in the pipeline config, or add worker nodes in cluster mode.
+
+### 7.3 Migration Failure
+
+**Symptom:** `MigrationError: relation "pipeline_runs" already exists`
+
+**Cause:** Partial migration from a previous interrupted run.
+
+**Fix:**
+```bash
+dataflow db migrate --repair
+```
+
+### 7.4 Kafka Connector Timeout
+
+**Symptom:** `KafkaTimeoutException` in connector logs.
+
+**Cause:** Kafka broker is unreachable or topic does not exist.
+
+**Fix:** Verify broker addresses in connector config. Ensure JDK 17 is installed and `JAVA_HOME` is set.
+
+---
+
+## 8. Monitoring and Logging
+
+DataFlow exposes a Prometheus metrics endpoint at `/metrics` on port 8080. Key metrics include:
+
+- `dataflow_pipeline_runs_total`: total pipeline runs by status
+- `dataflow_records_processed_total`: total records processed
+- `dataflow_pipeline_duration_seconds`: pipeline run duration
+- `dataflow_connector_errors_total`: connector error count
+
+Logs are written to `/var/log/dataflow/platform.log` by default. Log level can be configured via the `LOG_LEVEL` environment variable (DEBUG, INFO, WARNING, ERROR).
+
+---
+
+## 9. Security
+
+### 9.1 Authentication
+
+DataFlow supports three authentication methods: API Key, OAuth 2.0 (for cloud connectors), and LDAP/Active Directory for enterprise deployments.
+
+API keys are generated via:
+
+```bash
+dataflow auth create-key --name "my-key" --expires 90d
+```
+
+### 9.2 Encryption
+
+All data in transit is encrypted using TLS 1.3. Database credentials and connector secrets are stored encrypted at rest using AES-256. Never store plaintext credentials in pipeline YAML files — always use environment variables.
