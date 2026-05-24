@@ -11,7 +11,7 @@ from core.models.document import Document, Chunk, ChunkMetadata
 class SchemaChunker:
     """Chunks tabular data while preserving schema context."""
     
-    def __init__(self, rows_per_chunk: int = 10, include_headers: bool = True):
+    def __init__(self, rows_per_chunk: int = 2, include_headers: bool = True):
         """
         Initialize the schema chunker.
         

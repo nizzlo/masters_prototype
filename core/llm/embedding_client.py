@@ -22,6 +22,9 @@ class EmbeddingClient:
         self.model = model or settings.embedding_model
         logger.info(f"EmbeddingClient initialized with model: {self.model}")
     
+    # mxbai-embed-large's Ollama context cap is ~1018 chars; use 900 as a safe margin.
+    MAX_CHARS = 900
+
     def embed(self, text: str) -> list[float]:
         """
         Generate embedding for a single text.
@@ -32,6 +35,12 @@ class EmbeddingClient:
         Returns:
             List of floats representing the embedding vector.
         """
+        if len(text) > self.MAX_CHARS:
+            logger.warning(
+                f"Truncating text from {len(text)} to {self.MAX_CHARS} chars "
+                f"to fit embedding model context window."
+            )
+            text = text[:self.MAX_CHARS]
         try:
             response = ollama.embeddings(
                 model=self.model,
